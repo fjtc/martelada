@@ -1,4 +1,4 @@
-package marteladabr.com.brokenbits.martelada.engine;
+package br.com.brokenbits.martelada.engine;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,7 +22,7 @@ public class PropertiesFileEngine {
 	
 	private HashSet<Object> keySet = new HashSet<Object>();
 	
-	private int selected;
+	private volatile int selected;
 	
 	public PropertiesFileEngine() {
 	}
@@ -106,11 +106,11 @@ public class PropertiesFileEngine {
 	}
 	
 	public String getSelectedValue(Locale locale) {
-		return (String)this.files.get(locale).getProperties().get(this.getSelected());
+		return (String)this.files.get(locale).getProperties().get(this.getSelectedKey());
 	}
 	
 	public void setSelectedValue(Locale locale, String value) {
-		this.files.get(locale).getProperties().put(this.getSelected(), value);
+		this.files.get(locale).getProperties().put(this.getSelectedKey(), value);
 		notifyPropertyChanged(locale, this.getSelectedKey());
 	}
 	
@@ -137,6 +137,11 @@ public class PropertiesFileEngine {
 			return false;
 		}
 	}
+	
+	public boolean removeSelectedProperty() {
+		return this.removeProperty(this.getSelectedKey());
+	}
+
 
 	protected void notifyPropertyListChanged() {
 		for (PropertiesFileEngineListener l : this.listeners) {

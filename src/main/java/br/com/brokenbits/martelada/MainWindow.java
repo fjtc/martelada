@@ -1,4 +1,4 @@
-package marteladabr.com.brokenbits.martelada;
+package br.com.brokenbits.martelada;
 
 import java.awt.BorderLayout;
 import java.awt.datatransfer.DataFlavor;
@@ -26,7 +26,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 
-import marteladabr.com.brokenbits.martelada.engine.PropertiesFileEngine;
+import br.com.brokenbits.martelada.engine.PropertiesFileEngine;
 
 public class MainWindow extends JFrame {
 	
@@ -103,7 +103,8 @@ public class MainWindow extends JFrame {
 		PropertyListPanel propertyListPanel = new PropertyListPanel(this.engine);
 		JScrollPane selectScrollPane = new JScrollPane(propertyListPanel);
 		
-		JScrollPane mainScrollPane = new JScrollPane();
+		PropertyValuePanel propertyValuePanel = new PropertyValuePanel(this.engine); 
+		JScrollPane mainScrollPane = new JScrollPane(propertyValuePanel);
 		
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, selectScrollPane, mainScrollPane);
 		this.getContentPane().add(splitPane, BorderLayout.CENTER);

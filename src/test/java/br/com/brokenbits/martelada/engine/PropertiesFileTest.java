@@ -1,4 +1,4 @@
-package marteladabr.com.brokenbits.martelada.engine;
+package br.com.brokenbits.martelada.engine;
 
 import static org.junit.Assert.*;
 
@@ -6,7 +6,7 @@ import java.io.File;
 
 import org.junit.Test;
 
-import marteladabr.com.brokenbits.martelada.engine.PropertiesFile;
+import br.com.brokenbits.martelada.engine.PropertiesFile;
 
 public class PropertiesFileTest {
 

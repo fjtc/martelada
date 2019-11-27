@@ -1,4 +1,4 @@
-package marteladabr.com.brokenbits.martelada;
+package br.com.brokenbits.martelada;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,8 +8,8 @@ import javax.swing.ListModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
-import marteladabr.com.brokenbits.martelada.engine.PropertiesFileEngine;
-import marteladabr.com.brokenbits.martelada.engine.PropertiesFileEngineListener;
+import br.com.brokenbits.martelada.engine.PropertiesFileEngine;
+import br.com.brokenbits.martelada.engine.PropertiesFileEngineListener;
 
 public class PropertiesFileListModel implements ListModel<String> {
 	

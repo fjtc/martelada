@@ -1,4 +1,4 @@
-package marteladabr.com.brokenbits.martelada;
+package br.com.brokenbits.martelada;
 
 public class Main {
 
