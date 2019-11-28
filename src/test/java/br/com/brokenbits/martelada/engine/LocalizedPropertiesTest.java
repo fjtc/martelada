@@ -6,18 +6,17 @@ import java.io.File;
 
 import org.junit.Test;
 
-import br.com.brokenbits.martelada.engine.PropertiesFile;
+import br.com.brokenbits.martelada.engine.LocalizedProperties;
 
-public class PropertiesFileTest {
+public class LocalizedPropertiesTest {
 
 	@Test
 	public void testPropertiesFile() {
-		PropertiesFile p = new PropertiesFile();
+		LocalizedProperties p = new LocalizedProperties();
 		
 		assertNotNull(p.getProperties());
 		assertEquals(0, p.getProperties().size());
 		
-		assertNull(p.getFile());
 		assertNull(p.getLocale());
 	}
 
@@ -48,11 +47,9 @@ public class PropertiesFileTest {
 
 	@Test
 	public void testSave() throws Exception {
-		PropertiesFile p = new PropertiesFile();
+		LocalizedProperties p = new LocalizedProperties();
 		File file = File.createTempFile("test", ".properties");
-		p.setFile(file);
-		p.save();
+		p.save(file);
 		System.out.println(file);
 	}
-
 }

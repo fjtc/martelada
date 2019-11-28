@@ -8,13 +8,15 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
+import br.com.brokenbits.martelada.engine.ResourceLocale;
+
 public class PropertyValueTableModel implements TableModel {
 
 	public static class Property {
-		private final Locale locale;
+		private final ResourceLocale locale;
 		private String value;
 		
-		public Property(Locale locale, String value) {
+		public Property(ResourceLocale locale, String value) {
 			this.locale = locale;
 			this.value = value;
 		}
@@ -27,7 +29,7 @@ public class PropertyValueTableModel implements TableModel {
 			this.value = value;
 		}
 
-		public Locale getLocale() {
+		public ResourceLocale getLocale() {
 			return locale;
 		}
 	}
@@ -36,7 +38,7 @@ public class PropertyValueTableModel implements TableModel {
 
 	private List<Property> entries = new ArrayList<PropertyValueTableModel.Property>();
 	
-	private static final Class<?> [] COLUMN_TYPE = {Locale.class, String.class};	
+	private static final Class<?> [] COLUMN_TYPE = {ResourceLocale.class, String.class};	
 
 	@Override
 	public void addTableModelListener(TableModelListener l) {
@@ -97,7 +99,7 @@ public class PropertyValueTableModel implements TableModel {
 		}
 	}
 	
-	public void add(Locale locale, String value) {
+	public void add(ResourceLocale locale, String value) {
 		this.add(new Property(locale, value));
 	}
 	

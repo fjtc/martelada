@@ -12,12 +12,13 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
-import br.com.brokenbits.martelada.engine.PropertiesFileEngine;
-import br.com.brokenbits.martelada.engine.PropertiesFileEngineListener;
+import br.com.brokenbits.martelada.engine.PropertiesEditor;
+import br.com.brokenbits.martelada.engine.PropertiesEditorListener;
+import br.com.brokenbits.martelada.engine.ResourceLocale;
 
 public class PropertyValuePanel extends JPanel {
 	
-	private final PropertiesFileEngine engine;
+	private final PropertiesEditor engine;
 
 	private PropertyValueTableModel tableModel;
 	
@@ -25,20 +26,20 @@ public class PropertyValuePanel extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
 
-	public PropertyValuePanel(PropertiesFileEngine engine) {
+	public PropertyValuePanel(PropertiesEditor engine) {
 		this.engine = engine;
-		this.engine.addListener(new PropertiesFileEngineListener() {
+		this.engine.addListener(new PropertiesEditorListener() {
 			@Override
-			public void selectedChanged(String selected) {
+			public void selectedChanged(PropertiesEditor source, String selected) {
 				 onSelected();
 			}
 			
 			@Override
-			public void propertyListChanged() {
+			public void propertyListChanged(PropertiesEditor source) {
 			}
 			
 			@Override
-			public void propertyChanged(Locale locale, String key) {
+			public void propertyChanged(PropertiesEditor source, ResourceLocale locale, String key) {
 			}
 		});
 		
@@ -71,7 +72,7 @@ public class PropertyValuePanel extends JPanel {
 	private void onSelected() {
 
 		tableModel.clear();
-		for (Locale locale: this.engine.getLocales()) {
+		for (ResourceLocale locale: this.engine.getLocales()) {
 			tableModel.add(locale, this.engine.getSelectedValue(locale));
 		}
 	}

@@ -2,34 +2,36 @@ package br.com.brokenbits.martelada;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import javax.swing.ListModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
-import br.com.brokenbits.martelada.engine.PropertiesFileEngine;
-import br.com.brokenbits.martelada.engine.PropertiesFileEngineListener;
+import br.com.brokenbits.martelada.engine.PropertiesEditor;
+import br.com.brokenbits.martelada.engine.PropertiesEditorListener;
+import br.com.brokenbits.martelada.engine.ResourceLocale;
 
 public class PropertiesFileListModel implements ListModel<String> {
 	
 	private List<ListDataListener> listDataListenerList = new ArrayList<ListDataListener>();
 	
-	private final PropertiesFileEngine engine;
+	private final PropertiesEditor engine;
 	
-	public PropertiesFileListModel(PropertiesFileEngine engine) {
+	public PropertiesFileListModel(PropertiesEditor engine) {
 		this.engine = engine;
-		this.engine.addListener(new PropertiesFileEngineListener() {
+		this.engine.addListener(new PropertiesEditorListener() {
 			@Override
-			public void propertyListChanged() {
+			public void propertyListChanged(PropertiesEditor source) {
 				notifyChanges();	
 			}
 
 			@Override
-			public void propertyChanged(Locale locale, String key) {}
+			public void propertyChanged(PropertiesEditor source, ResourceLocale locale, String key) {
+			}
 			
 			@Override
-			public void selectedChanged(String selected) {}
+			public void selectedChanged(PropertiesEditor source, String selected) {
+			}
 		});
 	}
 

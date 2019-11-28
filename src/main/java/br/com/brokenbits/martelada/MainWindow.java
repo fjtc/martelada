@@ -33,7 +33,7 @@ import javax.swing.KeyStroke;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import br.com.brokenbits.martelada.engine.PropertiesFileEngine;
+import br.com.brokenbits.martelada.engine.PropertiesEditor;
 
 public class MainWindow extends JFrame {
 	
@@ -43,7 +43,7 @@ public class MainWindow extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	
-	private PropertiesFileEngine engine = new PropertiesFileEngine();
+	private PropertiesEditor propertyEditor = new PropertiesEditor();
 	
 	public MainWindow() {
 		super(RESOURCES.getString("application.title"));
@@ -109,10 +109,10 @@ public class MainWindow extends JFrame {
 			}
 		});
 
-		PropertyListPanel propertyListPanel = new PropertyListPanel(this.engine);
+		PropertyListPanel propertyListPanel = new PropertyListPanel(this.propertyEditor);
 		JScrollPane selectScrollPane = new JScrollPane(propertyListPanel);
 		
-		PropertyValuePanel propertyValuePanel = new PropertyValuePanel(this.engine); 
+		PropertyValuePanel propertyValuePanel = new PropertyValuePanel(this.propertyEditor); 
 				
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, selectScrollPane, propertyValuePanel);
 		splitPane.setDividerLocation(200);
@@ -194,13 +194,13 @@ public class MainWindow extends JFrame {
 	}
 	
 	private void doNewFile() {
-		this.engine.newFile();
+		this.propertyEditor.newFile();
 	}
 	
 	private void loadFile(File file) {
 	
 		try {
-			engine.load(file);
+			propertyEditor.load(file);
 			System.out.println(file.getAbsolutePath());
 		} catch (IOException e) {
 			logger.error("Unable to load the file {}.", file.getAbsolutePath(), e);
@@ -213,7 +213,7 @@ public class MainWindow extends JFrame {
 	private void saveFile(File file) {
 		
 		try {
-			engine.save(file);
+			propertyEditor.save(file);
 			System.out.println(file.getAbsolutePath());
 		} catch (IOException e) {
 			logger.error("Unable to save the file.", e);
@@ -225,7 +225,7 @@ public class MainWindow extends JFrame {
 	
 	private void saveFile() {
 		try {
-			this.engine.save();
+			this.propertyEditor.save();
 		} catch (IOException e) {
 			logger.error("Unable to save the file.", e);
 			JOptionPane.showMessageDialog(this, this.getTitle(), 
@@ -235,7 +235,7 @@ public class MainWindow extends JFrame {
 		
 	
 	private void doSave() {
-		if (this.engine.isSavePossible()) {
+		if (this.propertyEditor.isSavePossible()) {
 			saveFile();
 		} else {
 			doSaveAs();
@@ -250,7 +250,7 @@ public class MainWindow extends JFrame {
 	}
 	
 	private void doCopyKey() {
-		String key = this.engine.getSelectedKey();
+		String key = this.propertyEditor.getSelectedKey();
 
 		this.getToolkit().getSystemClipboard().setContents(new StringSelection(key), null);
 	}

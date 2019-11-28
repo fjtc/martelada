@@ -13,17 +13,17 @@ import javax.swing.JScrollPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import br.com.brokenbits.martelada.engine.PropertiesFileEngine;
+import br.com.brokenbits.martelada.engine.PropertiesEditor;
 
 public class PropertyListPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	private final PropertiesFileEngine engine;
+	private final PropertiesEditor engine;
 	
 	private JList<String> propertyList;
 	
-	public PropertyListPanel(PropertiesFileEngine engine) {
+	public PropertyListPanel(PropertiesEditor engine) {
 		this.engine = engine;
 		this.buildUI();
 	}

@@ -10,26 +10,26 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-public class PropertiesFileEngine {
+public class PropertiesEditor {
 	
-	public static final Locale NO_LOCALE = new Locale("__", "__", "__");
+	private List<PropertiesEditorListener> listeners = new ArrayList<PropertiesEditorListener>();
 	
-	private List<PropertiesFileEngineListener> listeners = new ArrayList<PropertiesFileEngineListener>();
-	
-	private LinkedHashMap<Locale, PropertiesFile> files = new LinkedHashMap<Locale, PropertiesFile>();
+	private LinkedHashMap<ResourceLocale, LocalizedProperties> files = new LinkedHashMap<ResourceLocale, LocalizedProperties>();
 	
 	private List<String> keyList = new ArrayList<String>();
 	
 	private HashSet<Object> keySet = new HashSet<Object>();
 	
+	private ResourceFile resourceFile;
+	
 	private volatile int selected;
 	
-	public PropertiesFileEngine() {
+	public PropertiesEditor() {
 	}
 	
 	protected void updateKeyList() {
 		keySet.clear();
-		for (PropertiesFile p: files.values()) {
+		for (LocalizedProperties p: files.values()) {
 			keySet.addAll(p.getProperties().keySet());
 		}
 		keyList.clear();
@@ -45,11 +45,11 @@ public class PropertiesFileEngine {
 		return this.keyList;
 	}
 
-	public Set<Locale> getLocales(){
+	public Set<ResourceLocale> getLocales(){
 		return files.keySet();
 	}
 	
-	public PropertiesFile getProperties(Locale locale) {
+	public LocalizedProperties getProperties(ResourceLocale locale) {
 		return files.get(locale);
 	}
 	
@@ -59,8 +59,8 @@ public class PropertiesFileEngine {
 	
 	public void newFile() {
 		this.clear();
-		PropertiesFile p = new PropertiesFile();
-		p.setLocale(NO_LOCALE);
+		LocalizedProperties p = new LocalizedProperties();
+		p.setLocale(ResourceLocale.DEFAULT);
 		this.files.put(p.getLocale(), p);
 	}
 	
@@ -69,25 +69,20 @@ public class PropertiesFileEngine {
 	}
 	
 	public boolean isSavePossible() {
-		for (PropertiesFile p : files.values()) {
-			if (p.getFile() == null) {
-				return false;
-			}
-		}
-		return true;
+		return (this.resourceFile != null);
 	}
 	
 	public void save() throws IOException {
 
-		for (PropertiesFile p : files.values()) {
-			p.save();
+		for (LocalizedProperties p : files.values()) {
+			//p.save();
 		}
 	}
 	
 	private void setFileName(File file) {
 		// TODO Add support for multiple languages
-		for (PropertiesFile p : files.values()) {
-			p.setFile(file);
+		for (LocalizedProperties p : files.values()) {
+			//p.setFile(file);
 		}
 	}
 	
@@ -97,10 +92,10 @@ public class PropertiesFileEngine {
 	}
 	
 	public void load(File file) throws IOException {
-		PropertiesFile p = new PropertiesFile();
-		p.setFile(file);
-		p.load();
-		this.files.put(NO_LOCALE, p);
+		LocalizedProperties p = new LocalizedProperties();
+		//p.setFile(file);
+		//p.load();
+		//this.files.put(NO_LOCALE, p);
 		updateKeyList();
 	}
 
@@ -117,11 +112,11 @@ public class PropertiesFileEngine {
 		this.notifySelectedChange(this.getSelectedKey());
 	}
 	
-	public String getSelectedValue(Locale locale) {
+	public String getSelectedValue(ResourceLocale locale) {
 		return (String)this.files.get(locale).getProperties().get(this.getSelectedKey());
 	}
 	
-	public void setSelectedValue(Locale locale, String value) {
+	public void setSelectedValue(ResourceLocale locale, String value) {
 		this.files.get(locale).getProperties().put(this.getSelectedKey(), value);
 		notifyPropertyChanged(locale, this.getSelectedKey());
 	}
@@ -130,7 +125,7 @@ public class PropertiesFileEngine {
 		if (keySet.contains(key)) {
 			return false;
 		} else {
-			for (PropertiesFile p : files.values()) {
+			for (LocalizedProperties p : files.values()) {
 				p.getProperties().put(key, key);
 			}
 			updateKeyList();
@@ -140,7 +135,7 @@ public class PropertiesFileEngine {
 	
 	public boolean removeProperty(String key) {
 		if (keySet.contains(key)) {
-			for (PropertiesFile p : files.values()) {
+			for (LocalizedProperties p : files.values()) {
 				p.getProperties().remove(key);
 			}
 			updateKeyList();
@@ -156,28 +151,28 @@ public class PropertiesFileEngine {
 
 
 	protected void notifyPropertyListChanged() {
-		for (PropertiesFileEngineListener l : this.listeners) {
-			l.propertyListChanged();
+		for (PropertiesEditorListener l : this.listeners) {
+			l.propertyListChanged(this);
 		}
 	}
 	
 	protected void notifySelectedChange(String selected) {
-		for (PropertiesFileEngineListener l : this.listeners) {
-			l.selectedChanged(selected);
+		for (PropertiesEditorListener l : this.listeners) {
+			l.selectedChanged(this, selected);
 		}
 	}
 	
-	protected void notifyPropertyChanged(Locale locale, String key) {
-		for (PropertiesFileEngineListener l : this.listeners) {
-			l.propertyChanged(locale, key);
+	protected void notifyPropertyChanged(ResourceLocale locale, String key) {
+		for (PropertiesEditorListener l : this.listeners) {
+			l.propertyChanged(this, locale, key);
 		}
 	}
 	
-	public void addListener(PropertiesFileEngineListener l) {
+	public void addListener(PropertiesEditorListener l) {
 		this.listeners.add(l);
 	}
 	
-	public void removeListener(PropertiesFileEngineListener l) {
+	public void removeListener(PropertiesEditorListener l) {
 		this.listeners.remove(l);
 	}
 }
