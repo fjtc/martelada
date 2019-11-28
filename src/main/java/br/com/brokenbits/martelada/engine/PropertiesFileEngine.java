@@ -12,7 +12,7 @@ import java.util.Set;
 
 public class PropertiesFileEngine {
 	
-	public static final Locale NO_LOCALE = new Locale("zz", "ZZ", "zz");
+	public static final Locale NO_LOCALE = new Locale("__", "__", "__");
 	
 	private List<PropertiesFileEngineListener> listeners = new ArrayList<PropertiesFileEngineListener>();
 	

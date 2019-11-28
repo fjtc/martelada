@@ -1,10 +1,16 @@
 package br.com.brokenbits.martelada;
 
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 
 import br.com.brokenbits.martelada.engine.PropertiesFileEngine;
 import br.com.brokenbits.martelada.engine.PropertiesFileEngineListener;
@@ -13,7 +19,9 @@ public class PropertyValuePanel extends JPanel {
 	
 	private final PropertiesFileEngine engine;
 
-	private List<ValuePanel> valuePanels = new ArrayList<ValuePanel>();
+	private PropertyValueTableModel tableModel;
+	
+	private JTable valueTable;
 	
 	private static final long serialVersionUID = 1L;
 
@@ -33,21 +41,46 @@ public class PropertyValuePanel extends JPanel {
 			public void propertyChanged(Locale locale, String key) {
 			}
 		});
-	}
-	
-	private void rebuildUI() {
-		this.removeAll();
-		this.valuePanels.clear();
 		
-		for (Locale locale: this.engine.getLocales()) {
-			ValuePanel valuePanel = new ValuePanel(locale, this.engine.getSelectedValue(locale));
-			this.valuePanels.add(valuePanel);
-			this.add(valuePanel);
-		}
-		this.revalidate();
+		this.buildUI();
 	}
 	
+	private void buildUI() {
+	
+		this.setLayout(new BorderLayout());
+		
+		tableModel = new PropertyValueTableModel();
+		valueTable = new JTable(tableModel);
+		JScrollPane valueScrollPane = new JScrollPane(valueTable);
+		
+		this.add(valueScrollPane, BorderLayout.CENTER);
+
+		JPanel buttonPanel = new JPanel();
+		this.add(buttonPanel, BorderLayout.SOUTH);
+		
+		JButton applyButton = new JButton("Apply");
+		applyButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				doApply();
+			}
+		});
+		buttonPanel.add(applyButton);
+	}
+
 	private void onSelected() {
-		rebuildUI();
+
+		tableModel.clear();
+		for (Locale locale: this.engine.getLocales()) {
+			tableModel.add(locale, this.engine.getSelectedValue(locale));
+		}
+	}
+	
+	private void doApply() {
+		
+		for (int i = 0; i < this.tableModel.getRowCount(); i++) {
+			var p = this.tableModel.get(i);
+			this.engine.setSelectedValue(p.getLocale(), p.getValue());
+		}
 	}
 }

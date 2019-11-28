@@ -104,9 +104,8 @@ public class MainWindow extends JFrame {
 		JScrollPane selectScrollPane = new JScrollPane(propertyListPanel);
 		
 		PropertyValuePanel propertyValuePanel = new PropertyValuePanel(this.engine); 
-		JScrollPane mainScrollPane = new JScrollPane(propertyValuePanel);
-		
-		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, selectScrollPane, mainScrollPane);
+				
+		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, selectScrollPane, propertyValuePanel);
 		this.getContentPane().add(splitPane, BorderLayout.CENTER);
 		
 		// Menu
