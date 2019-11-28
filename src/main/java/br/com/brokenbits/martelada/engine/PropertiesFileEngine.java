@@ -82,7 +82,19 @@ public class PropertiesFileEngine {
 		for (PropertiesFile p : files.values()) {
 			p.save();
 		}
-	}	
+	}
+	
+	private void setFileName(File file) {
+		// TODO Add support for multiple languages
+		for (PropertiesFile p : files.values()) {
+			p.setFile(file);
+		}
+	}
+	
+	public void save(File file) throws IOException {
+		setFileName(file);
+		save();
+	}
 	
 	public void load(File file) throws IOException {
 		PropertiesFile p = new PropertiesFile();

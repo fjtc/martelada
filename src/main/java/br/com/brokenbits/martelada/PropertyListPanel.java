@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -65,7 +66,9 @@ public class PropertyListPanel extends JPanel {
 	
 	protected void doAdd() {
 		
-		String value = JOptionPane.showInputDialog(this, "", "", JOptionPane.INFORMATION_MESSAGE);
+		String value = JOptionPane.showInputDialog(this, 
+				"Name of the new property:", "dasd", 
+				JOptionPane.INFORMATION_MESSAGE);
 		if (value != null) {
 			if (!this.engine.addProperty(value)) {
 				JOptionPane.showMessageDialog(this, "", "", JOptionPane.ERROR_MESSAGE);

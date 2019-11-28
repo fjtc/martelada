@@ -43,7 +43,6 @@ public class PropertiesFile {
 	
 	public void save() throws IOException {
 		try (FileOutputStream out = new FileOutputStream(this.getFile())) {
-			this.properties.clear();
 			this.properties.store(out, this.file.getName());
 		}
 	}

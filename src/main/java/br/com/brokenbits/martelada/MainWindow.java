@@ -2,6 +2,7 @@ package br.com.brokenbits.martelada;
 
 import java.awt.BorderLayout;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DnDConstants;
@@ -10,6 +11,8 @@ import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
@@ -25,10 +28,16 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.KeyStroke;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import br.com.brokenbits.martelada.engine.PropertiesFileEngine;
 
 public class MainWindow extends JFrame {
+	
+	private static final Logger logger = LoggerFactory.getLogger(MainWindow.class);
 	
 	private static final ResourceBundle RESOURCES = ResourceBundle.getBundle(MainWindow.class.getName());
 
@@ -110,10 +119,14 @@ public class MainWindow extends JFrame {
 		
 		// Menu
 		JMenuBar menuBar = new JMenuBar();
+		
+		// File menu
 		JMenu fileMenu = new JMenu(RESOURCES.getString("fileMenu.title"));
 		menuBar.add(fileMenu);
 		
 		JMenuItem newMenuItem = new JMenuItem(RESOURCES.getString("fileMenuItem.new"));
+		newMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, 
+				InputEvent.SHIFT_DOWN_MASK | InputEvent.ALT_DOWN_MASK));
 		newMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				doNewFile();
@@ -130,8 +143,10 @@ public class MainWindow extends JFrame {
 		fileMenu.add(openMenuItem);
 
 		JMenuItem saveMenuItem = new JMenuItem(RESOURCES.getString("fileMenuItem.save"));
+		saveMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
 		saveMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				doSave();
 			}
 		});
 		fileMenu.add(saveMenuItem);
@@ -139,6 +154,7 @@ public class MainWindow extends JFrame {
 		JMenuItem saveAsMenuItem = new JMenuItem(RESOURCES.getString("fileMenuItem.saveAs"));
 		saveAsMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				doSaveAs();
 			}
 		});
 		fileMenu.add(saveAsMenuItem);
@@ -151,6 +167,20 @@ public class MainWindow extends JFrame {
 			}
 		});
 		fileMenu.add(exitMenuItem);
+		
+		// File menu
+		JMenu editMenu = new JMenu(RESOURCES.getString("editMenu.title"));
+		menuBar.add(editMenu);
+		
+		JMenuItem copyKeyMenuItem = new JMenuItem(RESOURCES.getString("editMenuItem.copyKey"));
+		copyKeyMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK));
+		copyKeyMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				doCopyKey();
+			}
+		});
+		editMenu.add(copyKeyMenuItem);
+
 		
 		this.setJMenuBar(menuBar);
 	}
@@ -172,9 +202,56 @@ public class MainWindow extends JFrame {
 			engine.load(file);
 			System.out.println(file.getAbsolutePath());
 		} catch (IOException e) {
-			JOptionPane.showMessageDialog(this, this.getTitle(), 
-					String.format("Unable to load the file"), JOptionPane.ERROR_MESSAGE);
+			logger.error("Unable to load the file {}.", file.getAbsolutePath(), e);
+			JOptionPane.showMessageDialog(this, 
+					RESOURCES.getString("saveResultDialog.title"), 
+					String.format(""), JOptionPane.ERROR_MESSAGE);
 		}
+	}
+	
+	private void saveFile(File file) {
+		
+		try {
+			engine.save(file);
+			System.out.println(file.getAbsolutePath());
+		} catch (IOException e) {
+			logger.error("Unable to save the file.", e);
+			JOptionPane.showMessageDialog(this, 
+					RESOURCES.getString("saveResultDialog.title"), 
+					String.format(""), JOptionPane.ERROR_MESSAGE);
+		}
+	}
+	
+	private void saveFile() {
+		try {
+			this.engine.save();
+		} catch (IOException e) {
+			logger.error("Unable to save the file.", e);
+			JOptionPane.showMessageDialog(this, this.getTitle(), 
+					String.format("Unable to save the file."), JOptionPane.ERROR_MESSAGE);
+		}
+	}
+		
+	
+	private void doSave() {
+		if (this.engine.isSavePossible()) {
+			saveFile();
+		} else {
+			doSaveAs();
+		}
+	}
+	
+	private void doSaveAs() {
+		JFileChooser fileChooser = new JFileChooser();
+		if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+			saveFile(fileChooser.getSelectedFile());
+		}
+	}
+	
+	private void doCopyKey() {
+		String key = this.engine.getSelectedKey();
+
+		this.getToolkit().getSystemClipboard().setContents(new StringSelection(key), null);
 	}
 	
 	private void doExit() {
