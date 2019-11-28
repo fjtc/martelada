@@ -52,7 +52,7 @@ public class MainWindow extends JFrame {
 
 	private void buildUI() {
 		
-		this.setSize(400, 400);
+		this.setSize(600, 480);
 		this.getContentPane().setLayout(new BorderLayout());
 		
 		this.setDropTarget(new DropTarget() {
@@ -115,6 +115,7 @@ public class MainWindow extends JFrame {
 		PropertyValuePanel propertyValuePanel = new PropertyValuePanel(this.engine); 
 				
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, selectScrollPane, propertyValuePanel);
+		splitPane.setDividerLocation(200);
 		this.getContentPane().add(splitPane, BorderLayout.CENTER);
 		
 		// Menu

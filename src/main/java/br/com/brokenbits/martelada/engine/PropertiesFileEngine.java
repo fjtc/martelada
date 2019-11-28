@@ -131,7 +131,7 @@ public class PropertiesFileEngine {
 			return false;
 		} else {
 			for (PropertiesFile p : files.values()) {
-				p.getProperties().put(key, "");
+				p.getProperties().put(key, key);
 			}
 			updateKeyList();
 			return true;
