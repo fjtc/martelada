@@ -18,8 +18,16 @@
 package br.com.brokenbits.martelada.engine;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
+/**
+ * This class implements the base resource
+ * 
+ * @author fjtc
+ *
+ */
 public class ResourceFile {
 	
 	private final File baseFile;
@@ -38,9 +46,36 @@ public class ResourceFile {
 	public String getBaseName() {
 		return baseName;
 	}
+
+	public File getFile(Locale locale) {
+
+		if (locale == null) {
+			return baseFile;
+		} else {
+			return new File(this.baseFile.getParentFile(),
+					ResourceFileUtils.normalizeResourceFile(
+							this.baseName + ResourceFileUtils.createLocaleSuffix(locale)));
+		}
+	}
 	
-	public File getResouceName(Locale locale) {
-		// TODO
-		return null;
+	/**
+	 * List all resource files in the same directory of the base file
+	 * that may be related with this resource file. All files which
+	 * matches baseName + "_" + suffix + ".properties" will be listed
+	 * regardless of the format of suffix.
+	 * 
+	 * @return The list of potential related files.
+	 */
+	public List<File> listRelatedFiles(){
+		ArrayList<File> files = new ArrayList<File>();
+		String baseNameWithSuffixMarker = this.baseName + '_';
+		for (File f: this.baseFile.getParentFile().listFiles()) {
+			if ((f.isFile()) && 
+					(f.getName().startsWith(baseNameWithSuffixMarker)) && 
+					(f.getName().endsWith(ResourceFileUtils.FILE_SUFFIX))) {
+				files.add(f);
+			}
+		}		
+		return files;
 	}
 }
