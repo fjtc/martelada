@@ -36,7 +36,7 @@ public class LocalizedProperties {
 	public Properties getProperties() {
 		return properties;
 	}
-
+	
 	public void load(File file) throws IOException {
 		try (FileInputStream in = new FileInputStream(file)) {
 			this.properties.clear();

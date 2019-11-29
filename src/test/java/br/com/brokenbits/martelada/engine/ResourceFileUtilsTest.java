@@ -138,14 +138,25 @@ public class ResourceFileUtilsTest {
 	}
 	
 	@Test
-	public void testExtractVariantString() {
+	public void testHasExtractableSuffix() {
 		
-		assertEquals("en", ResourceFileUtils.extractVariantString("base", "base_en.properties"));
-		assertEquals("en_whatever", ResourceFileUtils.extractVariantString("base", "base_en_whatever.properties"));
+		assertTrue(ResourceFileUtils.hasExtractableSuffix("base", "base_en.properties"));
+		assertFalse(ResourceFileUtils.hasExtractableSuffix("base", "base.properties"));
+		assertFalse(ResourceFileUtils.hasExtractableSuffix("base", "base_e.properties"));
+		assertFalse(ResourceFileUtils.hasExtractableSuffix("basea", "base_en.properties"));
+		assertFalse(ResourceFileUtils.hasExtractableSuffix("base", "base_en.propertie"));
+		assertFalse(ResourceFileUtils.hasExtractableSuffix("base", "base_en_properties"));
+	}
+	
+	@Test
+	public void testExtractSuffix() {
 		
-		assertNull(ResourceFileUtils.extractVariantString("base", "base.properties"));
-		assertNull(ResourceFileUtils.extractVariantString("base", "base2_en.propertie"));
-		assertNull(ResourceFileUtils.extractVariantString("base2", "base_en.propertie"));
+		assertEquals("en", ResourceFileUtils.extractSuffix("base", "base_en.properties"));
+		assertEquals("en_whatever", ResourceFileUtils.extractSuffix("base", "base_en_whatever.properties"));
+		
+		assertNull(ResourceFileUtils.extractSuffix("base", "base.properties"));
+		assertNull(ResourceFileUtils.extractSuffix("base", "base2_en.propertie"));
+		assertNull(ResourceFileUtils.extractSuffix("base2", "base_en.propertie"));
 	}
 	
 	@Test

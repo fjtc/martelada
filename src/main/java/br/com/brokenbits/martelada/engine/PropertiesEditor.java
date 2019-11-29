@@ -27,17 +27,42 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class PropertiesEditor {
+	
+	private static final Logger logger = LoggerFactory.getLogger(PropertiesEditor.class);
+	
+	
+	public static class LoadedFileResult {
+		private final ResourceLocale locale;
+		private final File file;
+		
+		protected LoadedFileResult(ResourceLocale locale, File file) {
+			this.locale = locale;
+			this.file = file;
+		}
+
+		public ResourceLocale getLocale() {
+			return locale;
+		}
+		
+		public File getFile() {
+			return file;
+		}		
+	}
+	
 	
 	private List<PropertiesEditorListener> listeners = new ArrayList<PropertiesEditorListener>();
 	
-	private LinkedHashMap<ResourceLocale, LocalizedProperties> files = new LinkedHashMap<ResourceLocale, LocalizedProperties>();
+	private LinkedHashMap<ResourceLocale, LocalizedProperties> resourceFiles = new LinkedHashMap<ResourceLocale, LocalizedProperties>();
 	
 	private List<String> keyList = new ArrayList<String>();
 	
 	private HashSet<Object> keySet = new HashSet<Object>();
 	
-	private ResourceFile resourceFile;
+	private BaseResourceFile baseResourceFile;
 	
 	private volatile int selected;
 	
@@ -46,7 +71,7 @@ public class PropertiesEditor {
 	
 	protected void updateKeyList() {
 		keySet.clear();
-		for (LocalizedProperties p: files.values()) {
+		for (LocalizedProperties p: resourceFiles.values()) {
 			keySet.addAll(p.getProperties().keySet());
 		}
 		keyList.clear();
@@ -63,43 +88,48 @@ public class PropertiesEditor {
 	}
 
 	public Set<ResourceLocale> getLocales(){
-		return files.keySet();
+		return resourceFiles.keySet();
 	}
 	
 	public LocalizedProperties getProperties(ResourceLocale locale) {
-		return files.get(locale);
+		return resourceFiles.get(locale);
+	}
+	
+	public boolean isEditable() {
+		return !this.resourceFiles.isEmpty();
 	}
 	
 	public void clear() {
-		this.files.clear();
+		this.resourceFiles.clear();
 	}
 	
 	public void newFile() {
 		this.clear();
 		LocalizedProperties p = new LocalizedProperties(ResourceLocale.DEFAULT);
-		this.files.put(p.getLocale(), p);
+		this.resourceFiles.put(p.getLocale(), p);
 	}
 	
 	public boolean isLoaded() {
-		return !this.files.isEmpty();
+		return !this.resourceFiles.isEmpty();
 	}
 	
 	public boolean isSavePossible() {
-		return (this.resourceFile != null);
+		return (this.baseResourceFile != null);
 	}
 	
 	public void save() throws IOException {
 
-		for (LocalizedProperties p : files.values()) {
-			//p.save();
+		if (!this.isSavePossible()) {
+			throw new IllegalStateException("Base file name not set.");
+		}
+		for (LocalizedProperties p : resourceFiles.values()) {
+			File f = this.baseResourceFile.getFile(p.getLocale().getLocale());
+			p.save(f);
 		}
 	}
 	
-	private void setFileName(File file) {
-		// TODO Add support for multiple languages
-		for (LocalizedProperties p : files.values()) {
-			//p.setFile(file);
-		}
+	private void setFileName(File file) throws IllegalArgumentException {
+		this.baseResourceFile = new BaseResourceFile(file);
 	}
 	
 	public void save(File file) throws IOException {
@@ -107,12 +137,81 @@ public class PropertiesEditor {
 		save();
 	}
 	
-	public void load(File file) throws IOException {
-		LocalizedProperties p = new LocalizedProperties(ResourceLocale.DEFAULT);
-		//p.setFile(file);
-		//p.load();
-		//this.files.put(NO_LOCALE, p);
+	protected void addLocalizedProperties(LocalizedProperties p) {
+		this.resourceFiles.put(p.getLocale(), p);
+	}
+	
+	/**
+	 * Loads the resource file and all related translations.
+	 * 
+	 * @param file The base file. It must have the extension ".properties".
+	 * @return The report with the results of the loaded files or null if the
+	 * file is not a valid base resource file.
+	 * @throws IOException
+	 */
+	public List<LoadedFileResult> load(File file) throws IOException {
+
+		try {
+			this.setFileName(file);
+		} catch (IllegalArgumentException e) {
+			return null;
+		}
+		
+		this.clear();
+		
+		// Load the base first...
+		logger.info("Loading {}...", file.getAbsolutePath());
+		ArrayList<LoadedFileResult> result = new ArrayList<PropertiesEditor.LoadedFileResult>();
+		LocalizedProperties p = this.loadFile(file, true);
+		this.addLocalizedProperties(p);
+		result.add(new LoadedFileResult(p.getLocale(), file));
+	
+		// Load the other files
+		for (File f: this.baseResourceFile.listRelatedFiles()) {
+			p = this.loadFile(f, false);
+			if (p != null) {
+				logger.info("Translation file {} loaded.", f.getAbsolutePath());
+				this.addLocalizedProperties(p);
+				result.add(new LoadedFileResult(p.getLocale(), f));
+			} else {
+				logger.info("{} is not a valid translation file.", f.getAbsolutePath());
+				result.add(new LoadedFileResult(null, f));
+			}
+		}
+		
 		updateKeyList();
+		return result;
+	}
+	
+	protected LocalizedProperties loadFile(File file, boolean defaultLocale) throws IOException {
+		
+		ResourceLocale locale;
+		if (defaultLocale) {
+			locale = ResourceLocale.DEFAULT;
+		} else {
+			locale = this.extractLocale(file); 
+		}
+		if (locale == null) {
+			return null;
+		}
+		
+		LocalizedProperties props = new LocalizedProperties(locale);
+		props.load(file);
+		return props;
+	}
+	
+	protected ResourceLocale extractLocale(File file) {
+
+		String suffix = ResourceFileUtils.extractSuffix(this.baseResourceFile.getBaseName(), file.getName());
+		if (suffix != null) {
+			try {
+				return new ResourceLocale(ResourceFileUtils.parseLocaleSuffix(suffix));
+			} catch (IllegalArgumentException e) {
+				return null;
+			}
+		} else {
+			return null;
+		}
 	}
 
 	public int getSelected() {
@@ -129,11 +228,11 @@ public class PropertiesEditor {
 	}
 	
 	public String getSelectedValue(ResourceLocale locale) {
-		return (String)this.files.get(locale).getProperties().get(this.getSelectedKey());
+		return (String)this.resourceFiles.get(locale).getProperties().get(this.getSelectedKey());
 	}
 	
 	public void setSelectedValue(ResourceLocale locale, String value) {
-		this.files.get(locale).getProperties().put(this.getSelectedKey(), value);
+		this.resourceFiles.get(locale).getProperties().put(this.getSelectedKey(), value);
 		notifyPropertyChanged(locale, this.getSelectedKey());
 	}
 	
@@ -141,7 +240,7 @@ public class PropertiesEditor {
 		if (keySet.contains(key)) {
 			return false;
 		} else {
-			for (LocalizedProperties p : files.values()) {
+			for (LocalizedProperties p : resourceFiles.values()) {
 				p.getProperties().put(key, key);
 			}
 			updateKeyList();
@@ -151,7 +250,7 @@ public class PropertiesEditor {
 	
 	public boolean removeProperty(String key) {
 		if (keySet.contains(key)) {
-			for (LocalizedProperties p : files.values()) {
+			for (LocalizedProperties p : resourceFiles.values()) {
 				p.getProperties().remove(key);
 			}
 			updateKeyList();

@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 
 public class ResourceFileUtils {
 	
-	public static final String FILE_SUFFIX = ".properties";
+	public static final String FILE_EXTENSION = ".properties";
 	
 	// two-letter ISO 639
 	public static final Pattern LANGUAGE_PATTERN = Pattern.compile("^[a-z]{2,3}$");
@@ -49,10 +49,10 @@ public class ResourceFileUtils {
 	 */
 	public static String extractBaseName(String fileName) throws IllegalArgumentException {
 		
-		if ((fileName.length() <= FILE_SUFFIX.length()) || (!fileName.endsWith(FILE_SUFFIX))) {
+		if ((fileName.length() <= FILE_EXTENSION.length()) || (!fileName.endsWith(FILE_EXTENSION))) {
 			throw new IllegalArgumentException("The given fileName is not a valid resource name.");
 		}
-		return fileName.substring(0, fileName.length() - FILE_SUFFIX.length()); 
+		return fileName.substring(0, fileName.length() - FILE_EXTENSION.length()); 
 	}
 	
 	/**
@@ -63,8 +63,8 @@ public class ResourceFileUtils {
 	 */
 	public static String normalizeResourceFile(String fileName) {
 
-		if (!fileName.endsWith(FILE_SUFFIX)) {
-			return fileName + FILE_SUFFIX;
+		if (!fileName.endsWith(FILE_EXTENSION)) {
+			return fileName + FILE_EXTENSION;
 		} else {
 			return fileName;
 		}
@@ -78,24 +78,50 @@ public class ResourceFileUtils {
 	// "_en__variant"
 	// "_en_US"
 	// "_en"
-
+	
 	/**
-	 * Extracts the variant string from the given file name.
+	 * Verifies if a given resource has a suffix. It is important to notice that the
+	 * format of the suffix is not validated by this method.
+	 * 
+	 * <p>In order to have a suffix, the fileName must have the format 
+	 * [<code>baseName + "_" + suffix + FILE_EXTENSION</code>], where suffix must have
+	 * at least 2 characters in length.</p>
 	 * 
 	 * @param baseName The base name.
-	 * @param fileName
-	 * @return
+	 * @param fileName The file name.
+	 * @return True if it may be related or false otherwise.
 	 */
-	protected static String extractVariantString(String baseName, String fileName) {
-		int variantLen = fileName.length() - (baseName.length() + 1 + FILE_SUFFIX.length());
-		if (variantLen < 2) {
-			return null;
+	protected static boolean hasExtractableSuffix(String baseName, String fileName) {
+
+		int minimumSize = baseName.length() + 1 + 2 + FILE_EXTENSION.length();
+		if (fileName.length() < minimumSize) {
+			return false;
 		} else {
-			if (fileName.startsWith(baseName + "_") && fileName.endsWith(FILE_SUFFIX)) {
-				return fileName.substring(baseName.length() + 1, baseName.length() + 1 + variantLen);
-			} else {
-				return null;
-			}
+			return fileName.startsWith(baseName) && 
+					(fileName.charAt(baseName.length()) == '_') &&
+					fileName.endsWith(FILE_EXTENSION);
+		}
+	}
+
+	/**
+	 * Extracts the suffix of the file. It is important to notice that the
+	 * format of the suffix is not validated by this method.
+	 * 
+	 * <p>In order to have a suffix, the fileName must have the format 
+	 * [<code>baseName + "_" + suffix + FILE_EXTENSION</code>], where suffix must have
+	 * at least 2 characters in length.</p> 
+	 * 
+	 * @param baseName The base name.
+	 * @param fileName The file name.
+	 * @return The extracted suffix of null if it cannot be extracted.
+	 */
+	protected static String extractSuffix(String baseName, String fileName) {
+		
+		if (hasExtractableSuffix(baseName, fileName)) {
+			return fileName.substring(baseName.length() + 1, 
+					fileName.length() - FILE_EXTENSION.length());
+		} else {
+			return null;
 		}
 	}
 	

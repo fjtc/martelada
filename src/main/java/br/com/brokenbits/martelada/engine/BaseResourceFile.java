@@ -28,13 +28,13 @@ import java.util.Locale;
  * @author fjtc
  *
  */
-public class ResourceFile {
+public class BaseResourceFile {
 	
 	private final File baseFile;
 	
 	private final String baseName;
 	
-	public ResourceFile(File baseFile) throws IllegalArgumentException {
+	public BaseResourceFile(File baseFile) throws IllegalArgumentException {
 		this.baseName = ResourceFileUtils.extractBaseName(baseFile.getName());
 		this.baseFile = baseFile;
 	}
@@ -66,16 +66,19 @@ public class ResourceFile {
 	 * 
 	 * @return The list of potential related files.
 	 */
-	public List<File> listRelatedFiles(){
+	public List<File> listRelatedFiles() {
 		ArrayList<File> files = new ArrayList<File>();
-		String baseNameWithSuffixMarker = this.baseName + '_';
 		for (File f: this.baseFile.getParentFile().listFiles()) {
 			if ((f.isFile()) && 
-					(f.getName().startsWith(baseNameWithSuffixMarker)) && 
-					(f.getName().endsWith(ResourceFileUtils.FILE_SUFFIX))) {
+					(ResourceFileUtils.hasExtractableSuffix(baseName, f.getName()))) {
 				files.add(f);
 			}
 		}		
 		return files;
+	}
+	
+	public Locale extractLocale(File file) {
+		
+		return null;		
 	}
 }
