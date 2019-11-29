@@ -12,44 +12,28 @@ public class LocalizedPropertiesTest {
 
 	@Test
 	public void testPropertiesFile() {
-		LocalizedProperties p = new LocalizedProperties();
+		LocalizedProperties p = new LocalizedProperties(ResourceLocale.DEFAULT);
 		
 		assertNotNull(p.getProperties());
 		assertEquals(0, p.getProperties().size());
 		
-		assertNull(p.getLocale());
+		assertEquals(ResourceLocale.DEFAULT, p.getLocale());
 	}
 
 	@Test
-	public void testGetFile() {
-		//fail("Not yet implemented");
-	}
-
-	@Test
-	public void testSetFile() {
-		//fail("Not yet implemented");
-	}
-
-	@Test
-	public void testGetProperties() {
-		//fail("Not yet implemented");
-	}
-
-	@Test
-	public void testSetProperties() {
-		//fail("Not yet implemented");
-	}
-
-	@Test
-	public void testLoad() {
-		//fail("Not yet implemented");
+	public void testLoad() throws Exception {
+		File file = new File("sample", "sample.properties");
+		LocalizedProperties p = new LocalizedProperties(ResourceLocale.DEFAULT);
+		p.load(file);
+		
+		assertEquals(1, p.getProperties().size());
+		assertEquals("sample", p.getProperties().get("sample"));
 	}
 
 	@Test
 	public void testSave() throws Exception {
-		LocalizedProperties p = new LocalizedProperties();
+		LocalizedProperties p = new LocalizedProperties(ResourceLocale.DEFAULT);
 		File file = File.createTempFile("test", ".properties");
 		p.save(file);
-		System.out.println(file);
 	}
 }

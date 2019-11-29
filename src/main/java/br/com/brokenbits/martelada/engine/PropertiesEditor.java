@@ -59,8 +59,7 @@ public class PropertiesEditor {
 	
 	public void newFile() {
 		this.clear();
-		LocalizedProperties p = new LocalizedProperties();
-		p.setLocale(ResourceLocale.DEFAULT);
+		LocalizedProperties p = new LocalizedProperties(ResourceLocale.DEFAULT);
 		this.files.put(p.getLocale(), p);
 	}
 	
@@ -92,7 +91,7 @@ public class PropertiesEditor {
 	}
 	
 	public void load(File file) throws IOException {
-		LocalizedProperties p = new LocalizedProperties();
+		LocalizedProperties p = new LocalizedProperties(ResourceLocale.DEFAULT);
 		//p.setFile(file);
 		//p.load();
 		//this.files.put(NO_LOCALE, p);

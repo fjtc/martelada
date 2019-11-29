@@ -6,10 +6,16 @@ import java.util.Locale;
 /**
  * This class implements an immutable adapter to Java Locale that defines the
  * concept of a default value and also implements the Comparable interface.
+ * 
+ * <h3>Ordering</h3>
+ * 
+ * The ResourceLocale ordering respects the same ordering applied for
+ * strings returned by ResourceLocale.toString().
  *  
  * @author Fabio Jun Takada Chino
+ * @since 2019.11.28
  */
-public class ResourceLocale implements Comparable<ResourceLocale>, Serializable {
+public final class ResourceLocale implements Comparable<ResourceLocale>, Serializable {
 	
 	private static final long serialVersionUID = 1L;
 
@@ -25,47 +31,26 @@ public class ResourceLocale implements Comparable<ResourceLocale>, Serializable 
 	public boolean equals(Object obj) {
 		
 		if (obj instanceof ResourceLocale) {
-			return this.equals((ResourceLocale)obj);
+			return this.toString().equals(obj.toString());
 		} else {
 			return false;
 		}
 	}
 	
-	public boolean equals(ResourceLocale obj) {
-		
-		if (this.locale == null) {
-			return (obj.locale == null);
-		} else {
-			if (obj.locale == null) {
-				return false;
-			} else {
-				return this.locale.toString().equals(obj.locale.toString());
-			}
-		}
-	}
-	
 	@Override
 	public int hashCode() {
-		if (this.locale == null) {
-			return "".hashCode();
-		} else {
-			return this.locale.toString().hashCode();
-		}
+		return this.toString().hashCode();
 	}
 	
 	@Override
 	public int compareTo(ResourceLocale obj) {
-		if (this.equals(obj)) {
-			return 0;
-		} else {
-			return this.locale.toString().compareTo(obj.locale.toString());	
-		}
+		return this.toString().compareTo(obj.toString());
 	}
 	
 	@Override
 	public String toString() {
 		if (this.locale == null) {
-			return "DEFAULT";
+			return "";
 		} else {
 			return this.locale.toString();
 		}

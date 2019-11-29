@@ -8,19 +8,16 @@ import java.util.Properties;
 
 public class LocalizedProperties {
 
-	private Properties properties = new Properties();
+	private final Properties properties = new Properties();
 	
-	private ResourceLocale locale;
+	private final ResourceLocale locale;
 	
-	public LocalizedProperties() {
+	public LocalizedProperties(ResourceLocale locale) {
+		this.locale = locale;
 	}
 
 	public Properties getProperties() {
 		return properties;
-	}
-
-	public void setProperties(Properties properties) {
-		this.properties = properties;
 	}
 
 	public void load(File file) throws IOException {
@@ -38,9 +35,5 @@ public class LocalizedProperties {
 
 	public ResourceLocale getLocale() {
 		return locale;
-	}
-
-	public void setLocale(ResourceLocale locale) {
-		this.locale = locale;
 	}
 }
