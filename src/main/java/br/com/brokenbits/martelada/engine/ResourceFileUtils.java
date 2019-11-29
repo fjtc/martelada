@@ -8,16 +8,18 @@ public class ResourceFileUtils {
 	public static final String FILE_SUFFIX = ".properties";
 	
 	// two-letter ISO 639
-	public static final Pattern LANGUAGE_PATTERN = Pattern.compile("[a-z]{2,3}");
+	public static final Pattern LANGUAGE_PATTERN = Pattern.compile("^[a-z]{2,3}$");
 	
-	// two-letter ISO 3166 
-	public static final Pattern COUNTRY_PATTERN = Pattern.compile("[A-Z]{2}");
+	// two-letter ISO 3166 or UN M.49
+	public static final Pattern COUNTRY_PATTERN = Pattern.compile("^[A-Z]{2}|[0-9]{3}$");
 	
 	// IETF BCP 47
-	public static final Pattern VARIANT_PATTERN = Pattern.compile("[a-zA-Z0-9]{5,8}(_[a-zA-Z0-9]{5,8})*");
+	public static final Pattern VARIANT_PATTERN = Pattern.compile(
+			"^(([a-zA-Z][a-zA-Z0-9]{4,})|([0-9][a-zA-Z0-9]{3,}))" +
+			"(_(([a-zA-Z][a-zA-Z0-9]{4,})|([0-9][a-zA-Z0-9]{3,})))*$");
 	
 	// ISO 15924
-	public static final Pattern SCRIPT_PATTERN = Pattern.compile("[A-Z][a-z]{3}");
+	public static final Pattern SCRIPT_PATTERN = Pattern.compile("^[A-Z][a-z]{3}$");
 	
 
 	/**
@@ -80,13 +82,16 @@ public class ResourceFileUtils {
 		}
 	}
 	
-	
 	private static final int LANGUAGE_IDX = 0;
 	private static final int SCRIPT_IDX = 1;
 	private static final int COUNTRY_IDX = 2;
 	private static final int VARIANT_IDX = 3;
 	
 	protected static String [] parseLocaleParts(String suffix) throws IllegalArgumentException {
+		
+		if (suffix.isEmpty()) {
+			throw new IllegalArgumentException("The suffix cannot be empty.");	
+		}
 		String [] parts = new String[4];
 		SuffixTokenizer tokenizer = new SuffixTokenizer(suffix);
 		
@@ -110,6 +115,9 @@ public class ResourceFileUtils {
 			if (token != null) {
 				if (token.isEmpty()) {
 					token = tokenizer.nextToken();
+					if ((token == null) || (token.isEmpty())) {
+						throw new IllegalArgumentException("An empty contry must be followed by a valid variant.");
+					}
 				} else if (COUNTRY_PATTERN.matcher(token).matches()) {
 					parts[COUNTRY_IDX] = token;
 					token = tokenizer.nextToken();
@@ -125,7 +133,7 @@ public class ResourceFileUtils {
 					}
 					token = variant.toString();
 					if (VARIANT_PATTERN.matcher(token).matches()) {
-						parts[VARIANT_IDX] = token;
+						parts[VARIANT_IDX] = token.replace('_', '-');
 					} else {
 						throw new IllegalArgumentException(String.format("Invalid variant %1$s.", token));
 					}
@@ -135,22 +143,42 @@ public class ResourceFileUtils {
 		return parts;
 	}
 	
+	/**
+	 * Creates a new locale
+	 * @param parts The 4 parts of the locale in the following order:
+	 * @return
+	 */
+	public static Locale partsToLocale(String language, String script, String country, String variant) {
+		
+		Locale.Builder builder = new Locale.Builder();
+		if (language != null) {
+			builder.setLanguage(language);
+		}
+		if (script != null) {
+			builder.setScript(script);
+		}
+		if (country != null) {
+			builder.setRegion(country);
+		}
+		if (variant != null) {
+			builder.setVariant(variant);
+		}		
+		return builder.build();		
+	}
+	
 	public static Locale parseLocaleSuffix(String suffix) throws IllegalArgumentException {
 		
 		if ((suffix == null) || (suffix.isEmpty())) {
 			return null;
 		} else {
 			String [] parts = parseLocaleParts(suffix);
-			
-			Locale.Builder builder = new Locale.Builder();
-			if (parts[LANGUAGE_IDX] != null) {
-				builder.setLanguage(parts[LANGUAGE_IDX]);
-			}
-			
-			return builder.build();
+			return partsToLocale(
+					parts[LANGUAGE_IDX],
+					parts[SCRIPT_IDX],
+					parts[COUNTRY_IDX],
+					parts[VARIANT_IDX]);
 		}
 	}	
-	
 	
 	protected static boolean hasComponent(String component) {
 		return (component != null) && (!component.isEmpty());
