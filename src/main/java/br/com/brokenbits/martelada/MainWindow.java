@@ -50,6 +50,7 @@ import javax.swing.KeyStroke;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import br.com.brokenbits.martelada.engine.BaseResourceFile;
 import br.com.brokenbits.martelada.engine.PropertiesEditor;
 
 public class MainWindow extends JFrame {
@@ -63,8 +64,10 @@ public class MainWindow extends JFrame {
 	private PropertiesEditor propertyEditor = new PropertiesEditor();
 	
 	public MainWindow() {
-		super(RESOURCES.getString("application.title"));
+		super();
 		buildUI();
+
+		this.doNewFile();
 	}
 
 	private void buildUI() {
@@ -204,7 +207,7 @@ public class MainWindow extends JFrame {
 	}
 	
 	private void doLoadFile() {
-		JFileChooser fileChooser = new JFileChooser();
+		JFileChooser fileChooser = createFileChooser();
 		if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 			this.loadFile(fileChooser.getSelectedFile());
 		}
@@ -212,13 +215,15 @@ public class MainWindow extends JFrame {
 	
 	private void doNewFile() {
 		this.propertyEditor.newFile();
+		this.updateTitle();
 	}
 	
 	private void loadFile(File file) {
 	
 		try {
 			propertyEditor.load(file);
-			System.out.println(file.getAbsolutePath());
+			this.updateTitle();
+			AppPreferences.getPreferences().addRecent(file);
 		} catch (IOException e) {
 			logger.error("Unable to load the file {}.", file.getAbsolutePath(), e);
 			JOptionPane.showMessageDialog(this, 
@@ -231,7 +236,8 @@ public class MainWindow extends JFrame {
 		
 		try {
 			propertyEditor.save(file);
-			System.out.println(file.getAbsolutePath());
+			this.updateTitle();
+			AppPreferences.getPreferences().addRecent(file);
 		} catch (IOException e) {
 			logger.error("Unable to save the file.", e);
 			JOptionPane.showMessageDialog(this, 
@@ -249,7 +255,14 @@ public class MainWindow extends JFrame {
 					String.format("Unable to save the file."), JOptionPane.ERROR_MESSAGE);
 		}
 	}
-		
+	
+	private JFileChooser createFileChooser() {
+		JFileChooser fileChooser = new JFileChooser();
+		if (AppPreferences.getPreferences().getLastDirectory() != null) {
+			fileChooser.setCurrentDirectory(AppPreferences.getPreferences().getLastDirectory());
+		}	
+		return fileChooser;
+	}
 	
 	private void doSave() {
 		if (this.propertyEditor.isSavePossible()) {
@@ -260,7 +273,7 @@ public class MainWindow extends JFrame {
 	}
 	
 	private void doSaveAs() {
-		JFileChooser fileChooser = new JFileChooser();
+		JFileChooser fileChooser = createFileChooser();
 		if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
 			saveFile(fileChooser.getSelectedFile());
 		}
@@ -273,7 +286,19 @@ public class MainWindow extends JFrame {
 	}
 	
 	private void doExit() {
-		// TODO Perform some checks later
+		AppPreferences.getPreferences().save();
 		System.exit(0);
+	}
+	
+	private void updateTitle() {
+		String titlePattern = RESOURCES.getString("mainWindow.title");
+		BaseResourceFile f = this.propertyEditor.getBaseResourceFile();
+		String fileName;
+		if (f != null) {
+			fileName = f.getBaseFile().getAbsolutePath();
+		} else {
+			fileName = RESOURCES.getString("mainWindow.title.noFile");
+		}
+		this.setTitle(String.format(titlePattern, fileName));			
 	}
 }

@@ -18,45 +18,45 @@
 package br.com.brokenbits.martelada;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
+import br.com.brokenbits.martelada.engine.PropertiesEditor;
+import br.com.brokenbits.martelada.engine.PropertiesEditorListener;
 import br.com.brokenbits.martelada.engine.ResourceLocale;
 
 public class PropertyValueTableModel implements TableModel {
 
-	public static class Property {
-		private final ResourceLocale locale;
-		private String value;
-		
-		public Property(ResourceLocale locale, String value) {
-			this.locale = locale;
-			this.value = value;
-		}
-
-		public String getValue() {
-			return value;
-		}
-		
-		public void setValue(String value) {
-			this.value = value;
-		}
-
-		public ResourceLocale getLocale() {
-			return locale;
-		}
-	}
+	private PropertiesEditor editor;
 	
 	private List<TableModelListener> listeners = new ArrayList<TableModelListener>();
 
-	private List<Property> entries = new ArrayList<PropertyValueTableModel.Property>();
+	private List<ResourceLocale> locales = new ArrayList<ResourceLocale>(); 
 	
-	private static final Class<?> [] COLUMN_TYPE = {ResourceLocale.class, String.class};	
-
+	public PropertyValueTableModel(PropertiesEditor editor) {
+		this.editor = editor;
+		
+		this.editor.addListener(new PropertiesEditorListener() {
+			@Override
+			public void selectedChanged(PropertiesEditor source, String selected) {
+				 reload();
+			}
+			
+			@Override
+			public void propertyListChanged(PropertiesEditor source) {
+				reload();
+			}
+			
+			@Override
+			public void propertyChanged(PropertiesEditor source, ResourceLocale locale, String key) {
+			}
+		});		
+	}
+	
 	@Override
 	public void addTableModelListener(TableModelListener l) {
 		listeners.add(l);
@@ -64,7 +64,7 @@ public class PropertyValueTableModel implements TableModel {
 
 	@Override
 	public Class<?> getColumnClass(int columnIndex) {
-		return COLUMN_TYPE[columnIndex];
+		return String.class;
 	}
 
 	@Override
@@ -83,22 +83,22 @@ public class PropertyValueTableModel implements TableModel {
 
 	@Override
 	public int getRowCount() {
-		return this.entries.size();
+		return this.locales.size();
 	}
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		Property p = this.entries.get(rowIndex);
+		ResourceLocale locale = this.locales.get(rowIndex);
 		if (columnIndex == 0) {
-			return p.locale;
+			return locale.toString();
 		} else {
-			return p.value;
+			return this.editor.getSelectedValue(locale);
 		}
 	}
 
 	@Override
 	public boolean isCellEditable(int rowIndex, int columnIndex) {
-		return (columnIndex != 0);
+		return (columnIndex == 1);
 	}
 
 	@Override
@@ -110,33 +110,21 @@ public class PropertyValueTableModel implements TableModel {
 	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
 		
 		if (columnIndex == 1) {
-			Property p = this.entries.get(rowIndex);
-			p.value = (String)aValue;
-			notifyChange(new TableModelEvent(this, rowIndex));
+			ResourceLocale locale = this.locales.get(rowIndex);
+			this.editor.setSelectedValue(locale, (String)aValue);
 		}
-	}
-	
-	public void add(ResourceLocale locale, String value) {
-		this.add(new Property(locale, value));
-	}
-	
-	public void add(Property prop) {
-		this.entries.add(prop);
-		notifyChange(new TableModelEvent(this));
-	}
-	
-	public void clear() {
-		this.entries.clear();
-		notifyChange(new TableModelEvent(this));
-	}
-	
-	public Property get(int idx) {
-		return this.entries.get(idx);
 	}
 	
 	private void notifyChange(TableModelEvent e) {
 		for (TableModelListener l: this.listeners) {
 			l.tableChanged(e);
 		}
+	}
+	
+	public void reload() {
+		locales.clear();
+		locales.addAll(this.editor.getLocales());
+		Collections.sort(locales);
+		this.notifyChange(new TableModelEvent(this));
 	}
 }

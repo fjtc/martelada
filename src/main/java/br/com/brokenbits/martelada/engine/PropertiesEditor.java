@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -33,7 +32,6 @@ import org.slf4j.LoggerFactory;
 public class PropertiesEditor {
 	
 	private static final Logger logger = LoggerFactory.getLogger(PropertiesEditor.class);
-	
 	
 	public static class LoadedFileResult {
 		private final ResourceLocale locale;
@@ -52,7 +50,6 @@ public class PropertiesEditor {
 			return file;
 		}		
 	}
-	
 	
 	private List<PropertiesEditorListener> listeners = new ArrayList<PropertiesEditorListener>();
 	
@@ -289,5 +286,9 @@ public class PropertiesEditor {
 	
 	public void removeListener(PropertiesEditorListener l) {
 		this.listeners.remove(l);
+	}
+
+	public BaseResourceFile getBaseResourceFile() {
+		return baseResourceFile;
 	}
 }
