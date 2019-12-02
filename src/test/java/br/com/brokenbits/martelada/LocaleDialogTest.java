@@ -2,15 +2,15 @@ package br.com.brokenbits.martelada;
 
 import javax.swing.JFrame;
 
-public class PreferencesDialogTest {
-
+public class LocaleDialogTest {
 
 	public static void main(String[] args) {
 
-		PreferencesDialog d = new PreferencesDialog();
+		LocaleDialog d = new LocaleDialog();
 		d.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		d.setModal(true);
 		d.setVisible(true);
-		System.exit(0);		
+		System.out.println(d.getLocale());
+		System.exit(0);
 	}
 }

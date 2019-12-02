@@ -24,18 +24,33 @@ public class ResourceFileUtils {
 	
 	public static final String FILE_EXTENSION = ".properties";
 	
-	// two-letter ISO 639
+	/**
+	 * Two or 3 letter ISO 639 language code. Two letter is the preferred value.
+	 */
 	public static final Pattern LANGUAGE_PATTERN = Pattern.compile("^[a-z]{2,3}$");
 	
-	// two-letter ISO 3166 or UN M.49
+	/**
+	 * Two-letter ISO 3166 (preferred) or 3 digit UN M.49 country code.  
+	 */
 	public static final Pattern COUNTRY_PATTERN = Pattern.compile("^[A-Z]{2}|[0-9]{3}$");
 	
-	// IETF BCP 47
+	/**
+	 * Variant formatted one or more IETF BCP 47 tags separated by '_'. 
+	 */ 
 	public static final Pattern VARIANT_PATTERN = Pattern.compile(
 			"^(([a-zA-Z][a-zA-Z0-9]{4,})|([0-9][a-zA-Z0-9]{3,}))" +
 			"(_(([a-zA-Z][a-zA-Z0-9]{4,})|([0-9][a-zA-Z0-9]{3,})))*$");
 	
-	// ISO 15924
+	/**
+	 * Variant formatted one or more IETF BCP 47 tags separated by '-'. 
+	 */ 
+	public static final Pattern VARIANT_WITH_DASH_PATTERN = Pattern.compile(
+			"^(([a-zA-Z][a-zA-Z0-9]{4,})|([0-9][a-zA-Z0-9]{3,}))" +
+			"(\\-(([a-zA-Z][a-zA-Z0-9]{4,})|([0-9][a-zA-Z0-9]{3,})))*$");	
+	
+	/**
+	 * ISO 15924 4 letter script name.
+	 */
 	public static final Pattern SCRIPT_PATTERN = Pattern.compile("^[A-Z][a-z]{3}$");
 	
 
