@@ -20,6 +20,7 @@ package br.com.brokenbits.martelada;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.ResourceBundle;
 
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
@@ -31,11 +32,13 @@ import br.com.brokenbits.martelada.engine.ResourceLocale;
 
 public class PropertyValueTableModel implements TableModel {
 
+	private static final ResourceBundle RESOURCES = ResourceBundle.getBundle(PropertyValueTableModel.class.getName());
+	
 	private PropertiesEditor editor;
 	
 	private List<TableModelListener> listeners = new ArrayList<TableModelListener>();
 
-	private List<ResourceLocale> locales = new ArrayList<ResourceLocale>(); 
+	private List<ResourceLocale> locales = new ArrayList<ResourceLocale>();
 	
 	public PropertyValueTableModel(PropertiesEditor editor) {
 		this.editor = editor;
@@ -75,9 +78,9 @@ public class PropertyValueTableModel implements TableModel {
 	@Override
 	public String getColumnName(int columnIndex) {
 		if (columnIndex == 0) {
-			return "Locale";
+			return RESOURCES.getString("column.locale");
 		} else {
-			return "Value";
+			return RESOURCES.getString("column.value");
 		}
 	}
 

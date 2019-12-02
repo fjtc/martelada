@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -55,6 +56,8 @@ import br.com.brokenbits.martelada.engine.PropertiesEditor;
 
 public class MainWindow extends JFrame {
 	
+	private static final String RECENT_FILE_ID_PROPERTY = "br.com.brokenbits.martelada.MainWindow.recentFileId";
+
 	private static final Logger logger = LoggerFactory.getLogger(MainWindow.class);
 	
 	private static final ResourceBundle RESOURCES = ResourceBundle.getBundle(MainWindow.class.getName());
@@ -62,6 +65,10 @@ public class MainWindow extends JFrame {
 	private static final long serialVersionUID = 1L;
 	
 	private PropertiesEditor propertyEditor = new PropertiesEditor();
+	
+	private JMenu recentFilesMenu;
+	
+	private ActionListener recentFilesMenuActionListener;
 	
 	public MainWindow() {
 		super();
@@ -130,11 +137,10 @@ public class MainWindow extends JFrame {
 		});
 
 		PropertyListPanel propertyListPanel = new PropertyListPanel(this.propertyEditor);
-		JScrollPane selectScrollPane = new JScrollPane(propertyListPanel);
 		
 		PropertyValuePanel propertyValuePanel = new PropertyValuePanel(this.propertyEditor); 
 				
-		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, selectScrollPane, propertyValuePanel);
+		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, propertyListPanel, propertyValuePanel);
 		splitPane.setDividerLocation(200);
 		this.getContentPane().add(splitPane, BorderLayout.CENTER);
 		
@@ -162,6 +168,21 @@ public class MainWindow extends JFrame {
 			}
 		});
 		fileMenu.add(openMenuItem);
+		
+		recentFilesMenu = new JMenu(RESOURCES.getString("fileMenuItem.openRecent"));
+		openMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				doLoadFile();
+			}
+		});
+		fileMenu.add(recentFilesMenu);
+		recentFilesMenuActionListener = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Integer id = (Integer)((JComponent)e.getSource()).getClientProperty(RECENT_FILE_ID_PROPERTY);
+				loadRecent(id);
+			}
+		};
 
 		JMenuItem saveMenuItem = new JMenuItem(RESOURCES.getString("fileMenuItem.save"));
 		saveMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
@@ -192,6 +213,7 @@ public class MainWindow extends JFrame {
 		// File menu
 		JMenu editMenu = new JMenu(RESOURCES.getString("editMenu.title"));
 		menuBar.add(editMenu);
+		updateRecentFiles();
 		
 		JMenuItem copyKeyMenuItem = new JMenuItem(RESOURCES.getString("editMenuItem.copyKey"));
 		copyKeyMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK));
@@ -242,6 +264,7 @@ public class MainWindow extends JFrame {
 			propertyEditor.load(file);
 			this.updateTitle();
 			AppPreferences.getPreferences().addRecent(file);
+			updateRecentFiles();
 		} catch (IOException e) {
 			logger.error("Unable to load the file {}.", file.getAbsolutePath(), e);
 			JOptionPane.showMessageDialog(this, 
@@ -256,6 +279,7 @@ public class MainWindow extends JFrame {
 			propertyEditor.save(file);
 			this.updateTitle();
 			AppPreferences.getPreferences().addRecent(file);
+			updateRecentFiles();
 		} catch (IOException e) {
 			logger.error("Unable to save the file.", e);
 			JOptionPane.showMessageDialog(this, 
@@ -326,12 +350,33 @@ public class MainWindow extends JFrame {
 		} else {
 			fileName = RESOURCES.getString("mainWindow.title.noFile");
 		}
-		this.setTitle(String.format(titlePattern, fileName));			
+		this.setTitle(String.format(titlePattern, fileName));
 	}
 	
 	private void doPreferences() {
 		PreferencesDialog preferencesDialog = new PreferencesDialog();
 		preferencesDialog.setModal(true);
 		preferencesDialog.setVisible(true);
+	}
+	
+	private void loadRecent(int i) {
+		if (i < AppPreferences.getPreferences().getRecentFiles().size()) {
+			this.loadFile(AppPreferences.getPreferences().getRecentFiles().get(i));
+		}
+	}
+	
+	private void updateRecentFiles() {
+		
+		String recentPattern = RESOURCES.getString("fileMenuItem.openRecent.itemPattern");
+		this.recentFilesMenu.removeAll();
+		int i = 0;
+		for (File f: AppPreferences.getPreferences().getRecentFiles()) {
+			JMenuItem menuItem = new JMenuItem(String.format(recentPattern,
+					i + 1, f.getAbsolutePath()));
+			menuItem.putClientProperty(RECENT_FILE_ID_PROPERTY, i);
+			menuItem.addActionListener(recentFilesMenuActionListener);
+			this.recentFilesMenu.add(menuItem);
+			i++;
+		}
 	}
 }

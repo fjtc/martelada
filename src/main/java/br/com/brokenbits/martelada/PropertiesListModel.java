@@ -28,13 +28,13 @@ import br.com.brokenbits.martelada.engine.PropertiesEditor;
 import br.com.brokenbits.martelada.engine.PropertiesEditorListener;
 import br.com.brokenbits.martelada.engine.ResourceLocale;
 
-public class PropertiesFileListModel implements ListModel<String> {
+public class PropertiesListModel implements ListModel<String> {
 	
 	private List<ListDataListener> listDataListenerList = new ArrayList<ListDataListener>();
 	
 	private final PropertiesEditor engine;
 	
-	public PropertiesFileListModel(PropertiesEditor engine) {
+	public PropertiesListModel(PropertiesEditor engine) {
 		this.engine = engine;
 		this.engine.addListener(new PropertiesEditorListener() {
 			@Override
