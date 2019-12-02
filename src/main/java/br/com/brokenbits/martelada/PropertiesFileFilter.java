@@ -17,17 +17,22 @@
  */
 package br.com.brokenbits.martelada;
 
-import javax.swing.JFrame;
+import java.io.File;
+import java.util.ResourceBundle;
 
-public class PreferencesDialogTest {
+import javax.swing.filechooser.FileFilter;
 
+public class PropertiesFileFilter extends FileFilter {
 
-	public static void main(String[] args) {
+	private static final ResourceBundle RESOURCES = ResourceBundle.getBundle(PropertiesFileFilter.class.getName());
+	
+	@Override
+	public boolean accept(File f) {
+		return f.getName().endsWith(".properties");
+	}
 
-		PreferencesDialog d = new PreferencesDialog();
-		d.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		d.setModal(true);
-		d.setVisible(true);
-		System.exit(0);		
+	@Override
+	public String getDescription() {
+		return RESOURCES.getString("filter.description");
 	}
 }

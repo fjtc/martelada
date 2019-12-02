@@ -243,6 +243,7 @@ public class MainWindow extends JFrame {
 	
 	private void doLoadFile() {
 		JFileChooser fileChooser = createFileChooser();
+		fileChooser.setFileFilter(new PropertiesFileFilter());
 		if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 			this.loadFile(fileChooser.getSelectedFile());
 		}

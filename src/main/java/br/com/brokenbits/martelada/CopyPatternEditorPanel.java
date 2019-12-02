@@ -1,7 +1,25 @@
+/**
+ * martelada - a very simple Java resource file editor 
+ * Copyright (C) 2019 Fabio Jun Takada Chino
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package br.com.brokenbits.martelada;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ResourceBundle;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -13,6 +31,8 @@ import javax.swing.SpringLayout;
 
 public class CopyPatternEditorPanel extends JPanel implements PreferencesEditor {
 
+	private static final ResourceBundle RESOURCES = ResourceBundle.getBundle(CopyPatternEditorPanel.class.getName());
+	
 	private static final long serialVersionUID = 1L;
 	
 	private JTextField patternTextField;
@@ -28,7 +48,7 @@ public class CopyPatternEditorPanel extends JPanel implements PreferencesEditor 
 		SpringLayout layout = new SpringLayout();
 		this.setLayout(layout);
 		
-		JLabel patternEditLabel = new JLabel("Pattern");
+		JLabel patternEditLabel = new JLabel(RESOURCES.getString("pattern.label"));
 		this.add(patternEditLabel);
 		
 		patternTextField = new JTextField();
@@ -44,14 +64,14 @@ public class CopyPatternEditorPanel extends JPanel implements PreferencesEditor 
 		this.add(updateButton);
 		 
 		JTextArea descriptionTextArea = new JTextArea(
-				String.format("This pattern is used to copy keys into the clipboard. It may have assume any value but must have '%1$s'", 
+				String.format(RESOURCES.getString("pattern.description"), 
 						CopyPattern.KEY_STRING));
 		descriptionTextArea.setEditable(false);
 		descriptionTextArea.setBackground(this.getBackground());
 		descriptionTextArea.setLineWrap(true);
 		this.add(descriptionTextArea);
 		
-		JLabel patternPreviewLabel = new JLabel("Pattern preview");
+		JLabel patternPreviewLabel = new JLabel(RESOURCES.getString("pattern.preview.label"));
 		this.add(patternPreviewLabel);
 		
 		previewTextField = new JTextField();
@@ -86,7 +106,7 @@ public class CopyPatternEditorPanel extends JPanel implements PreferencesEditor 
 
 	@Override
 	public String getTitle() {
-		return "Copy pattern";
+		return RESOURCES.getString("panel.title");
 	}
 	
 	@Override
@@ -107,7 +127,8 @@ public class CopyPatternEditorPanel extends JPanel implements PreferencesEditor 
 			try {
 				return new CopyPattern(this.patternTextField.getText());
 			} catch (IllegalArgumentException e) {
-				JOptionPane.showMessageDialog(this, "Invalid pattern.", this.getTitle(), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, RESOURCES.getString("message.invalidPattern"),
+						this.getTitle(), JOptionPane.ERROR_MESSAGE);
 				return null;
 			}
 		}
