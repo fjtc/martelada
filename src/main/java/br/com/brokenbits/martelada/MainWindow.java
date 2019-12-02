@@ -170,11 +170,6 @@ public class MainWindow extends JFrame {
 		fileMenu.add(openMenuItem);
 		
 		recentFilesMenu = new JMenu(RESOURCES.getString("fileMenuItem.openRecent"));
-		openMenuItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				doLoadFile();
-			}
-		});
 		fileMenu.add(recentFilesMenu);
 		recentFilesMenuActionListener = new ActionListener() {
 			@Override
