@@ -32,6 +32,11 @@ It is also important to have the following files in the same directory:
 This project uses **Apache Maven 3.6** or later as its build tool. To build
 it, just run ``mvn install`` inside the root directory of this project.
 
+## Eclipse
+
+In order to use it as an Eclipse project, just run ``mvn mvn eclipse:eclipse``
+before import the project.
+
 ## Licensing
 
 This program is licensed under GNU GENERAL PUBLIC LICENSE, Version 3.
