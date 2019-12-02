@@ -201,7 +201,25 @@ public class MainWindow extends JFrame {
 			}
 		});
 		editMenu.add(copyKeyMenuItem);
+		
+		JMenuItem copyKeyWithPatternMenuItem = new JMenuItem(RESOURCES.getString("editMenuItem.copyKeyWithPattern"));
+		copyKeyWithPatternMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, 
+				InputEvent.CTRL_DOWN_MASK |InputEvent.ALT_DOWN_MASK));
+		copyKeyWithPatternMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				doCopyKeyWithPattern();
+			}
+		});
+		editMenu.add(copyKeyWithPatternMenuItem);		
 
+		editMenu.addSeparator();
+		JMenuItem preferencesMenuItem = new JMenuItem(RESOURCES.getString("editMenuItem.preferences"));
+		preferencesMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				doPreferences();
+			}
+		});
+		editMenu.add(preferencesMenuItem);
 		
 		this.setJMenuBar(menuBar);
 	}
@@ -252,7 +270,7 @@ public class MainWindow extends JFrame {
 		} catch (IOException e) {
 			logger.error("Unable to save the file.", e);
 			JOptionPane.showMessageDialog(this, this.getTitle(), 
-					String.format("Unable to save the file."), JOptionPane.ERROR_MESSAGE);
+					String.format(RESOURCES.getString("messages.unableToSave")), JOptionPane.ERROR_MESSAGE);
 		}
 	}
 	
@@ -285,6 +303,15 @@ public class MainWindow extends JFrame {
 		this.getToolkit().getSystemClipboard().setContents(new StringSelection(key), null);
 	}
 	
+	private void doCopyKeyWithPattern() {
+		String key = this.propertyEditor.getSelectedKey();
+
+		if (AppPreferences.getPreferences().getCopyPattern() != null) {
+			key = AppPreferences.getPreferences().getCopyPattern().format(key);
+		}
+		this.getToolkit().getSystemClipboard().setContents(new StringSelection(key), null);
+	}
+	
 	private void doExit() {
 		AppPreferences.getPreferences().save();
 		System.exit(0);
@@ -300,5 +327,11 @@ public class MainWindow extends JFrame {
 			fileName = RESOURCES.getString("mainWindow.title.noFile");
 		}
 		this.setTitle(String.format(titlePattern, fileName));			
+	}
+	
+	private void doPreferences() {
+		PreferencesDialog preferencesDialog = new PreferencesDialog();
+		preferencesDialog.setModal(true);
+		preferencesDialog.setVisible(true);
 	}
 }

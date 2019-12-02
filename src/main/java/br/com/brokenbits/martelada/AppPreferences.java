@@ -7,6 +7,8 @@ import java.util.prefs.Preferences;
 
 public class AppPreferences {
 	
+	private static final String COPY_PATTERN_KEY = "copyPattern";
+
 	private static final String RECENT_FILE_ITEM_KEY = "recentFile.";
 
 	private static final String LAST_DIRECTORY_KEY = "lastDirectory";
@@ -19,7 +21,7 @@ public class AppPreferences {
 	
 	private File lastDirectory;
 	
-	private String copyPattern;
+	private CopyPattern copyPattern;
 
 	private AppPreferences() {
 	}
@@ -39,6 +41,11 @@ public class AppPreferences {
 		if (this.lastDirectory != null) {
 			PREFERENCES.put(LAST_DIRECTORY_KEY, this.lastDirectory.getAbsolutePath());
 		}
+		
+		if (this.copyPattern != null) {
+			PREFERENCES.put(COPY_PATTERN_KEY, this.copyPattern.getPattern());
+		}
+		
 		for (int i = 0; i < this.recentFiles.size(); i++) {
 			PREFERENCES.put(RECENT_FILE_ITEM_KEY + i, this.recentFiles.get(i).getAbsolutePath());
 		}
@@ -51,6 +58,16 @@ public class AppPreferences {
 			this.lastDirectory = new File(value);
 		} else {
 			this.lastDirectory = null;
+		}
+		
+		value = PREFERENCES.get(COPY_PATTERN_KEY, null);
+		if (value != null) {
+			this.copyPattern = null;
+			try {
+				this.copyPattern = new CopyPattern(value);
+			} catch (IllegalArgumentException e) {
+				// TODO Add to the logger
+			}
 		}
 			
 		this.recentFiles.clear();
@@ -82,11 +99,11 @@ public class AppPreferences {
 		return lastDirectory;
 	}
 
-	public String getCopyPattern() {
+	public CopyPattern getCopyPattern() {
 		return copyPattern;
 	}
 
-	public void setCopyPattern(String copyPattern) {
+	public void setCopyPattern(CopyPattern copyPattern) {
 		this.copyPattern = copyPattern;
 	}
 }
