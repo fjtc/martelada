@@ -86,7 +86,12 @@ public class PropertyValueTableModel implements TableModel {
 
 	@Override
 	public int getRowCount() {
-		return this.locales.size();
+		
+		if (this.editor.getSelected() < 0) {
+			return 0;
+		} else {
+			return this.locales.size();
+		}
 	}
 
 	@Override

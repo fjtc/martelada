@@ -77,6 +77,9 @@ public class PropertiesEditor {
 			keyList.add(key.toString());
 		}
 		Collections.sort(keyList);
+		if (this.selected >= this.keyList.size()) {
+			this.selected = this.keyList.size() - 1;
+		}
 		this.notifyPropertyListChanged();
 	}
 	
@@ -104,7 +107,10 @@ public class PropertiesEditor {
 	public void newFile() {
 		this.clear();
 		LocalizedProperties p = new LocalizedProperties(ResourceLocale.DEFAULT);
+		p.getProperties().put("default", "default");
 		this.resourceFiles.put(p.getLocale(), p);
+		this.updateKeyList();
+		this.notifyPropertyListChanged();
 	}
 	
 	public boolean isLoaded() {
@@ -217,7 +223,11 @@ public class PropertiesEditor {
 	}
 
 	public String getSelectedKey() {
-		return this.keyList.get(this.selected);
+		if (this.selected >= 0) {
+			return this.keyList.get(this.selected);
+		} else {
+			return null;
+		}
 	}
 
 	public void setSelected(int selected) {
@@ -226,7 +236,12 @@ public class PropertiesEditor {
 	}
 	
 	public String getSelectedValue(ResourceLocale locale) {
-		return (String)this.resourceFiles.get(locale).getProperties().get(this.getSelectedKey());
+		String key = this.getSelectedKey();
+		if (key != null) {
+			return (String)this.resourceFiles.get(locale).getProperties().get(key);
+		} else {
+			return null;
+		}			
 	}
 	
 	public void setSelectedValue(ResourceLocale locale, String value) {
@@ -309,5 +324,7 @@ public class PropertiesEditor {
 			p.getProperties().put(k, k);
 		}
 		this.addLocalizedProperties(p);
+		this.updateKeyList();
+		this.notifyPropertyListChanged();
 	}
 }
