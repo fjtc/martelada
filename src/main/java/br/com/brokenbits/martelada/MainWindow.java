@@ -35,6 +35,7 @@ import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 import javax.swing.JComponent;
@@ -44,7 +45,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 
@@ -227,7 +227,16 @@ public class MainWindow extends JFrame {
 				doCopyKeyWithPattern();
 			}
 		});
-		editMenu.add(copyKeyWithPatternMenuItem);		
+		editMenu.add(copyKeyWithPatternMenuItem);
+		
+		editMenu.addSeparator();
+		JMenuItem addNewLocaleMenuItem = new JMenuItem(RESOURCES.getString("editMenuItem.addLocale"));
+		addNewLocaleMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				doAddNewLocale();
+			}
+		});
+		editMenu.add(addNewLocaleMenuItem);				
 
 		editMenu.addSeparator();
 		JMenuItem preferencesMenuItem = new JMenuItem(RESOURCES.getString("editMenuItem.preferences"));
@@ -373,6 +382,24 @@ public class MainWindow extends JFrame {
 			menuItem.addActionListener(recentFilesMenuActionListener);
 			this.recentFilesMenu.add(menuItem);
 			i++;
+		}
+	}
+	
+	private void doAddNewLocale() {
+		LocaleDialog dialog = new LocaleDialog();
+		dialog.setModal(true);
+		dialog.setVisible(true);
+		Locale l = dialog.getLocale();
+		if (l != null) {
+			if (this.propertyEditor.addLocale(l)) {
+				JOptionPane.showMessageDialog(this, 
+						RESOURCES.getString("saveResultDialog.title"), 
+						this.getTitle(), JOptionPane.INFORMATION_MESSAGE);
+			} else {
+				JOptionPane.showMessageDialog(this, 
+						RESOURCES.getString("saveResultDialog.title"), 
+						this.getTitle(), JOptionPane.ERROR_MESSAGE);
+			}
 		}
 	}
 }

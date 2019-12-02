@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -290,5 +291,23 @@ public class PropertiesEditor {
 
 	public BaseResourceFile getBaseResourceFile() {
 		return baseResourceFile;
+	}
+	
+	public boolean addLocale(Locale locale) {
+		ResourceLocale l = new ResourceLocale(locale);
+		if (this.resourceFiles.containsKey(l)) {
+			return false;
+		} else {
+			this.addLocale(l);
+			return true;
+		}
+	}
+	
+	protected void addLocale(ResourceLocale locale) {
+		LocalizedProperties p = new LocalizedProperties(locale);
+		for (String k : this.keyList) {
+			p.getProperties().put(k, k);
+		}
+		this.addLocalizedProperties(p);
 	}
 }
