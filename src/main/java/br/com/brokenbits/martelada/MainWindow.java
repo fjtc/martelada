@@ -220,8 +220,7 @@ public class MainWindow extends JFrame {
 		editMenu.add(copyKeyMenuItem);
 		
 		JMenuItem copyKeyWithPatternMenuItem = new JMenuItem(RESOURCES.getString("editMenuItem.copyKeyWithPattern"));
-		copyKeyWithPatternMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, 
-				InputEvent.CTRL_DOWN_MASK |InputEvent.ALT_DOWN_MASK));
+		copyKeyWithPatternMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C,	InputEvent.ALT_DOWN_MASK));
 		copyKeyWithPatternMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				doCopyKeyWithPattern();
