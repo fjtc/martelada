@@ -25,9 +25,7 @@ public class LocaleDialogTest {
 
 		LocaleDialog d = new LocaleDialog();
 		d.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		d.setModal(true);
-		d.setVisible(true);
-		System.out.println(d.getLocale());
+		System.out.println(d.showDialog());
 		System.exit(0);
 	}
 }
