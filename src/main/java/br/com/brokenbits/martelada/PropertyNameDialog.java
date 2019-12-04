@@ -3,6 +3,8 @@ package br.com.brokenbits.martelada;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.Set;
 
 import javax.swing.JButton;
@@ -41,6 +43,13 @@ public class PropertyNameDialog extends JDialog {
 		
 		keyTextField = new JTextField();
 		mainPanel.add(keyTextField);
+		keyTextField.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				doOK();
+			}
+		});
+	
 		
 		springLayout.putConstraint(SpringLayout.NORTH, keyLabel, 5, SpringLayout.NORTH, mainPanel);
 		springLayout.putConstraint(SpringLayout.WEST, keyLabel, 5, SpringLayout.WEST, mainPanel);

@@ -302,6 +302,10 @@ public class MainWindow extends JFrame {
 			this.updateTitle();
 			AppPreferences.getPreferences().addRecent(file);
 			updateRecentFiles();
+			JOptionPane.showMessageDialog(this, 
+					"File saved.",
+					this.getTitle(),
+					JOptionPane.ERROR_MESSAGE);
 		} catch (IOException e) {
 			logger.error("Unable to save the file.", e);
 			JOptionPane.showMessageDialog(this, 
@@ -314,6 +318,10 @@ public class MainWindow extends JFrame {
 	private void saveFile() {
 		try {
 			this.propertyEditor.save();
+			JOptionPane.showMessageDialog(this, 
+					"File saved.",
+					this.getTitle(),
+					JOptionPane.ERROR_MESSAGE);
 		} catch (IOException e) {
 			logger.error("Unable to save the file.", e);
 			JOptionPane.showMessageDialog(this, this.getTitle(), 
@@ -436,6 +444,7 @@ public class MainWindow extends JFrame {
 					JOptionPane.showMessageDialog(this, 
 							"Property renamed.", 
 							this.getTitle(), JOptionPane.ERROR_MESSAGE);
+					this.propertyListPanel.setSelected(newKey);
 				} else {
 					JOptionPane.showMessageDialog(this, 
 							"Unable to rename the property.", 

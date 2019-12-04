@@ -90,9 +90,17 @@ public class PropertyListPanel extends JPanel {
 		String newKey = d.showDialog("Add new key", this.getSelected(), this.propertyEditor.getKeys());
 		if (newKey != null) {
 			if (!this.propertyEditor.addProperty(newKey)) {
-				JOptionPane.showMessageDialog(this, "", "", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, 
+						"Unable to add the new property.", 
+						"Add property.", JOptionPane.ERROR_MESSAGE);
+			} else {
+				setSelected(newKey);
 			}
 		}
+	}
+	
+	public void setSelected(String key) {
+		this.propertyList.setSelectedValue(key, true);
 	}
 	
 	private void doSelect() {
