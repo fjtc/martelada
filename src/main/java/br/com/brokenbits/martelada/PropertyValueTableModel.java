@@ -27,6 +27,7 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
 import br.com.brokenbits.martelada.engine.PropertiesEditor;
+import br.com.brokenbits.martelada.engine.PropertiesEditorEvent;
 import br.com.brokenbits.martelada.engine.PropertiesEditorListener;
 import br.com.brokenbits.martelada.engine.ResourceLocale;
 
@@ -40,22 +41,21 @@ public class PropertyValueTableModel implements TableModel {
 
 	private List<ResourceLocale> locales = new ArrayList<ResourceLocale>();
 	
+	private String selected;
+	
 	public PropertyValueTableModel(PropertiesEditor editor) {
 		this.editor = editor;
-		
 		this.editor.addListener(new PropertiesEditorListener() {
 			@Override
-			public void selectedChanged(PropertiesEditor source, String selected) {
-				 reload();
-			}
-			
-			@Override
-			public void propertyListChanged(PropertiesEditor source) {
-				reload();
-			}
-			
-			@Override
-			public void propertyChanged(PropertiesEditor source, ResourceLocale locale, String key) {
+			public void onPropertiesEditorEvent(PropertiesEditor source, PropertiesEditorEvent e) {
+				switch (e.getType()) {
+				case RELOAD:
+				case LOCALE_ADDED:
+				case LOCALE_REMOVED:
+					updateLocaleList();
+					break;
+				default:
+				}
 			}
 		});		
 	}
@@ -87,7 +87,7 @@ public class PropertyValueTableModel implements TableModel {
 	@Override
 	public int getRowCount() {
 		
-		if (this.editor.getSelected() < 0) {
+		if (this.getSelected() == null) {
 			return 0;
 		} else {
 			return this.locales.size();
@@ -100,13 +100,17 @@ public class PropertyValueTableModel implements TableModel {
 		if (columnIndex == 0) {
 			return locale.toString();
 		} else {
-			return this.editor.getSelectedValue(locale);
+			return this.editor.getValue(locale, this.getSelected());
 		}
 	}
 
 	@Override
 	public boolean isCellEditable(int rowIndex, int columnIndex) {
-		return (columnIndex == 1);
+		if (this.selected != null) {
+			return (columnIndex == 1);
+		} else {
+			return false;
+		}
 	}
 
 	@Override
@@ -119,7 +123,7 @@ public class PropertyValueTableModel implements TableModel {
 		
 		if (columnIndex == 1) {
 			ResourceLocale locale = this.locales.get(rowIndex);
-			this.editor.setSelectedValue(locale, (String)aValue);
+			this.editor.setValue(locale, this.getSelected(), (String)aValue);
 		}
 	}
 	
@@ -130,9 +134,22 @@ public class PropertyValueTableModel implements TableModel {
 	}
 	
 	public void reload() {
+		updateLocaleList();
+	}
+
+	protected void updateLocaleList() {
 		locales.clear();
 		locales.addAll(this.editor.getLocales());
 		Collections.sort(locales);
-		this.notifyChange(new TableModelEvent(this));
+		this.notifyChange(new TableModelEvent(this, TableModelEvent.ALL_COLUMNS));
+	}
+	
+	public String getSelected() {
+		return selected;
+	}
+
+	public void setSelected(String selected) {
+		this.selected = selected;
+		notifyChange(new TableModelEvent(this, TableModelEvent.ALL_COLUMNS));
 	}
 }

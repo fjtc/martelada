@@ -20,6 +20,8 @@ package br.com.brokenbits.martelada;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JList;
@@ -38,6 +40,8 @@ public class PropertyListPanel extends JPanel {
 	private final PropertiesEditor engine;
 	
 	private JList<String> propertyList;
+	
+	private List<PropertySelectionListener> propertySelectionListenerList = new ArrayList<PropertySelectionListener>();
 	
 	public PropertyListPanel(PropertiesEditor engine) {
 		this.engine = engine;
@@ -75,7 +79,7 @@ public class PropertyListPanel extends JPanel {
 		propertyList.addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent event) {
-				engine.setSelected(propertyList.getSelectedIndex());
+				doSelect();
 			}
 		});
 	}
@@ -92,8 +96,30 @@ public class PropertyListPanel extends JPanel {
 		}
 	}
 	
+	private void doSelect() {
+		String selected = getSelected();
+		for (PropertySelectionListener l: this.propertySelectionListenerList) {
+			l.propertySelected(this, selected);
+		}
+	}
+	
+	public String getSelected() {
+		return this.propertyList.getSelectedValue();
+	}
+	
 	protected void doRemove() {
 
-		this.engine.removeSelectedProperty();
+		String key = this.propertyList.getSelectedValue();
+		if (key != null) {
+			this.engine.removeProperty(key);
+		}
+	}
+	
+	public void addPropertySelectionListener(PropertySelectionListener l) {
+		this.propertySelectionListenerList.add(l);
+	}
+	
+	public void removePropertySelectionListener(PropertySelectionListener l) {
+		this.propertySelectionListenerList.remove(l);
 	}
 }

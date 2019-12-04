@@ -56,13 +56,9 @@ public class PropertiesEditor {
 	
 	private LinkedHashMap<ResourceLocale, LocalizedProperties> resourceFiles = new LinkedHashMap<ResourceLocale, LocalizedProperties>();
 	
-	private List<String> keyList = new ArrayList<String>();
-	
-	private HashSet<Object> keySet = new HashSet<Object>();
+	private HashSet<String> keySet = new HashSet<String>();
 	
 	private BaseResourceFile baseResourceFile;
-	
-	private volatile int selected;
 	
 	public PropertiesEditor() {
 	}
@@ -70,22 +66,14 @@ public class PropertiesEditor {
 	protected void updateKeyList() {
 		keySet.clear();
 		for (LocalizedProperties p: resourceFiles.values()) {
-			keySet.addAll(p.getProperties().keySet());
+			for (Object key: p.getProperties().keySet()) {
+				keySet.add(key.toString());
+			}
 		}
-		keyList.clear();
-		for (Object key: keySet) {
-			keyList.add(key.toString());
-		}
-		Collections.sort(keyList);
-		if (this.selected >= this.keyList.size()) {
-			this.selected = this.keyList.size() - 1;
-		}
-		this.notifyPropertyListChanged();
 	}
 	
-	public List<String> getKeys(){
-		
-		return this.keyList;
+	public Set<String> getKeys(){
+		return this.keySet;
 	}
 
 	public Set<ResourceLocale> getLocales(){
@@ -110,7 +98,7 @@ public class PropertiesEditor {
 		p.getProperties().put("default", "default");
 		this.resourceFiles.put(p.getLocale(), p);
 		this.updateKeyList();
-		this.notifyPropertyListChanged();
+		this.notifyPropertiesListener(new PropertiesEditorEvent(PropertiesEditorEvent.EventType.RELOAD));
 	}
 	
 	public boolean isLoaded() {
@@ -182,8 +170,8 @@ public class PropertiesEditor {
 				result.add(new LoadedFileResult(null, f));
 			}
 		}
-		
 		updateKeyList();
+		this.notifyPropertiesListener(new PropertiesEditorEvent(PropertiesEditorEvent.EventType.RELOAD));
 		return result;
 	}
 	
@@ -217,26 +205,8 @@ public class PropertiesEditor {
 			return null;
 		}
 	}
-
-	public int getSelected() {
-		return this.selected;
-	}
-
-	public String getSelectedKey() {
-		if (this.selected >= 0) {
-			return this.keyList.get(this.selected);
-		} else {
-			return null;
-		}
-	}
-
-	public void setSelected(int selected) {
-		this.selected = selected;
-		this.notifySelectedChange(this.getSelectedKey());
-	}
 	
-	public String getSelectedValue(ResourceLocale locale) {
-		String key = this.getSelectedKey();
+	public String getValue(ResourceLocale locale, String key) {
 		if (key != null) {
 			return (String)this.resourceFiles.get(locale).getProperties().get(key);
 		} else {
@@ -244,9 +214,15 @@ public class PropertiesEditor {
 		}			
 	}
 	
-	public void setSelectedValue(ResourceLocale locale, String value) {
-		this.resourceFiles.get(locale).getProperties().put(this.getSelectedKey(), value);
-		notifyPropertyChanged(locale, this.getSelectedKey());
+	public void setValue(ResourceLocale locale, String key, String value) {
+
+		String oldValue = this.getValue(locale, key);
+		if ((oldValue == null) || (!value.equals(oldValue))) {
+			this.resourceFiles.get(locale).getProperties().put(key, value);
+			this.notifyPropertiesListener(new PropertiesEditorEvent(
+					PropertiesEditorEvent.EventType.PROPERTY_CHANGED,
+					locale, key, value, oldValue));
+		}
 	}
 	
 	public boolean addProperty(String key) {
@@ -257,6 +233,8 @@ public class PropertiesEditor {
 				p.getProperties().put(key, key);
 			}
 			updateKeyList();
+			this.notifyPropertiesListener(new PropertiesEditorEvent(
+					PropertiesEditorEvent.EventType.PROPERTY_ADDED, null, key, null, null));
 			return true;
 		}
 	}
@@ -267,32 +245,17 @@ public class PropertiesEditor {
 				p.getProperties().remove(key);
 			}
 			updateKeyList();
+			this.notifyPropertiesListener(new PropertiesEditorEvent(
+					PropertiesEditorEvent.EventType.PROPERTY_REMOVED, null, key, null, null));			
 			return true;
 		} else {
 			return false;
 		}
 	}
-	
-	public boolean removeSelectedProperty() {
-		return this.removeProperty(this.getSelectedKey());
-	}
 
-
-	protected void notifyPropertyListChanged() {
+	protected void notifyPropertiesListener(PropertiesEditorEvent e) {
 		for (PropertiesEditorListener l : this.listeners) {
-			l.propertyListChanged(this);
-		}
-	}
-	
-	protected void notifySelectedChange(String selected) {
-		for (PropertiesEditorListener l : this.listeners) {
-			l.selectedChanged(this, selected);
-		}
-	}
-	
-	protected void notifyPropertyChanged(ResourceLocale locale, String key) {
-		for (PropertiesEditorListener l : this.listeners) {
-			l.propertyChanged(this, locale, key);
+			l.onPropertiesEditorEvent(this, e);
 		}
 	}
 	
@@ -320,11 +283,12 @@ public class PropertiesEditor {
 	
 	protected void addLocale(ResourceLocale locale) {
 		LocalizedProperties p = new LocalizedProperties(locale);
-		for (String k : this.keyList) {
+		for (String k : this.keySet) {
 			p.getProperties().put(k, k);
 		}
 		this.addLocalizedProperties(p);
 		this.updateKeyList();
-		this.notifyPropertyListChanged();
+		this.notifyPropertiesListener(new PropertiesEditorEvent(
+				PropertiesEditorEvent.EventType.LOCALE_ADDED, locale));
 	}
 }

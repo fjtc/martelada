@@ -18,6 +18,7 @@
 package br.com.brokenbits.martelada;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.ListModel;
@@ -25,30 +26,33 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
 import br.com.brokenbits.martelada.engine.PropertiesEditor;
+import br.com.brokenbits.martelada.engine.PropertiesEditorEvent;
 import br.com.brokenbits.martelada.engine.PropertiesEditorListener;
-import br.com.brokenbits.martelada.engine.ResourceLocale;
 
 public class PropertiesListModel implements ListModel<String> {
 	
 	private List<ListDataListener> listDataListenerList = new ArrayList<ListDataListener>();
+	
+	private List<String> keyList = new ArrayList<String>();
 	
 	private final PropertiesEditor engine;
 	
 	public PropertiesListModel(PropertiesEditor engine) {
 		this.engine = engine;
 		this.engine.addListener(new PropertiesEditorListener() {
-			@Override
-			public void propertyListChanged(PropertiesEditor source) {
-				notifyChanges();	
-			}
 
 			@Override
-			public void propertyChanged(PropertiesEditor source, ResourceLocale locale, String key) {
-			}
-			
-			@Override
-			public void selectedChanged(PropertiesEditor source, String selected) {
-			}
+			public void onPropertiesEditorEvent(PropertiesEditor source, PropertiesEditorEvent e) {
+				switch (e.getType()) {
+				case RELOAD:
+				case PROPERTY_ADDED:
+				case PROPERTY_REMOVED:
+					reload();
+					break;
+				default:
+				}
+				
+			}	
 		});
 	}
 
@@ -60,17 +64,32 @@ public class PropertiesListModel implements ListModel<String> {
 
 	@Override
 	public String getElementAt(int idx) {
-		return engine.getKeys().get(idx);
+		return keyList.get(idx);
 	}
 
 	@Override
 	public int getSize() {
-		return engine.getKeys().size();
+		return keyList.size();
 	}
 
 	@Override
 	public void removeListDataListener(ListDataListener listener) {
 		this.listDataListenerList.remove(listener);
+	}
+	
+	private boolean isFiltered(String key) {
+		return false;
+	}
+	
+	public void reload() {
+		keyList.clear();
+		for (String key: this.engine.getKeys()) {
+			if (!isFiltered(key)) {
+				keyList.add(key);
+			}
+		}
+		Collections.sort(keyList);
+		this.notifyChanges();
 	}
 	
 	private void notifyChanges() {

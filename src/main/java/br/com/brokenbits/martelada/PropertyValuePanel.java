@@ -18,22 +18,14 @@
 package br.com.brokenbits.martelada;
 
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 
-import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
 import br.com.brokenbits.martelada.engine.PropertiesEditor;
-import br.com.brokenbits.martelada.engine.PropertiesEditorListener;
-import br.com.brokenbits.martelada.engine.ResourceLocale;
 
-public class PropertyValuePanel extends JPanel {
+public class PropertyValuePanel extends JPanel implements PropertySelectionListener {
 	
 	private final PropertiesEditor editor;
 
@@ -58,7 +50,10 @@ public class PropertyValuePanel extends JPanel {
 		this.add(valueScrollPane, BorderLayout.CENTER);
 	}
 
-	private void onSelected() {
-		tableModel.reload();
+	@Override
+	public void propertySelected(Object source, String key) {
+		tableModel.setSelected(key);
+		this.valueTable.clearSelection();
+		this.revalidate();
 	}
 }

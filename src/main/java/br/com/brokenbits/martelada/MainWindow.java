@@ -66,6 +66,11 @@ public class MainWindow extends JFrame {
 	
 	private PropertiesEditor propertyEditor = new PropertiesEditor();
 	
+	private PropertyListPanel propertyListPanel;;
+	
+	private PropertyValuePanel propertyValuePanel;
+	
+	
 	private JMenu recentFilesMenu;
 	
 	private ActionListener recentFilesMenuActionListener;
@@ -136,9 +141,10 @@ public class MainWindow extends JFrame {
 			}
 		});
 
-		PropertyListPanel propertyListPanel = new PropertyListPanel(this.propertyEditor);
-		
-		PropertyValuePanel propertyValuePanel = new PropertyValuePanel(this.propertyEditor); 
+		propertyListPanel = new PropertyListPanel(this.propertyEditor);
+
+		propertyValuePanel = new PropertyValuePanel(this.propertyEditor);
+		propertyListPanel.addPropertySelectionListener(propertyValuePanel);
 				
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, propertyListPanel, propertyValuePanel);
 		splitPane.setDividerLocation(200);
@@ -287,8 +293,9 @@ public class MainWindow extends JFrame {
 		} catch (IOException e) {
 			logger.error("Unable to save the file.", e);
 			JOptionPane.showMessageDialog(this, 
-					RESOURCES.getString("saveResultDialog.title"), 
-					String.format(""), JOptionPane.ERROR_MESSAGE);
+					RESOURCES.getString("save.failed"),
+					this.getTitle(),
+					JOptionPane.ERROR_MESSAGE);
 		}
 	}
 	
@@ -326,18 +333,22 @@ public class MainWindow extends JFrame {
 	}
 	
 	private void doCopyKey() {
-		String key = this.propertyEditor.getSelectedKey();
 
-		this.getToolkit().getSystemClipboard().setContents(new StringSelection(key), null);
+		String key = this.propertyListPanel.getSelected();
+		if (key != null) {
+			this.getToolkit().getSystemClipboard().setContents(new StringSelection(key), null);
+		}
 	}
 	
 	private void doCopyKeyWithPattern() {
-		String key = this.propertyEditor.getSelectedKey();
 
-		if (AppPreferences.getPreferences().getCopyPattern() != null) {
-			key = AppPreferences.getPreferences().getCopyPattern().format(key);
+		String key = this.propertyListPanel.getSelected();
+		if (key != null) {
+			if (AppPreferences.getPreferences().getCopyPattern() != null) {
+				key = AppPreferences.getPreferences().getCopyPattern().format(key);
+			}
+			this.getToolkit().getSystemClipboard().setContents(new StringSelection(key), null);
 		}
-		this.getToolkit().getSystemClipboard().setContents(new StringSelection(key), null);
 	}
 	
 	private void doExit() {
@@ -392,11 +403,13 @@ public class MainWindow extends JFrame {
 		if (l != null) {
 			if (this.propertyEditor.addLocale(l)) {
 				JOptionPane.showMessageDialog(this, 
-						RESOURCES.getString("saveResultDialog.title"), 
-						this.getTitle(), JOptionPane.INFORMATION_MESSAGE);
+						String.format(RESOURCES.getString("addLocale.success"),
+								l.toString()), 
+						this.getTitle(), 
+						JOptionPane.INFORMATION_MESSAGE);
 			} else {
 				JOptionPane.showMessageDialog(this, 
-						RESOURCES.getString("saveResultDialog.title"), 
+						RESOURCES.getString("addLocale.failed"), 
 						this.getTitle(), JOptionPane.ERROR_MESSAGE);
 			}
 		}
