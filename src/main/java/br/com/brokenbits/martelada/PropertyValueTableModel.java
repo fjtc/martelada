@@ -35,7 +35,7 @@ public class PropertyValueTableModel implements TableModel {
 
 	private static final ResourceBundle RESOURCES = ResourceBundle.getBundle(PropertyValueTableModel.class.getName());
 	
-	private PropertiesEditor editor;
+	private PropertiesEditor propertyEditor;
 	
 	private List<TableModelListener> listeners = new ArrayList<TableModelListener>();
 
@@ -43,9 +43,9 @@ public class PropertyValueTableModel implements TableModel {
 	
 	private String selected;
 	
-	public PropertyValueTableModel(PropertiesEditor editor) {
-		this.editor = editor;
-		this.editor.addListener(new PropertiesEditorListener() {
+	public PropertyValueTableModel(PropertiesEditor propertyEditor) {
+		this.propertyEditor = propertyEditor;
+		this.propertyEditor.addListener(new PropertiesEditorListener() {
 			@Override
 			public void onPropertiesEditorEvent(PropertiesEditor source, PropertiesEditorEvent e) {
 				switch (e.getType()) {
@@ -100,7 +100,7 @@ public class PropertyValueTableModel implements TableModel {
 		if (columnIndex == 0) {
 			return locale.toString();
 		} else {
-			return this.editor.getValue(locale, this.getSelected());
+			return this.propertyEditor.getValue(locale, this.getSelected());
 		}
 	}
 
@@ -123,7 +123,7 @@ public class PropertyValueTableModel implements TableModel {
 		
 		if (columnIndex == 1) {
 			ResourceLocale locale = this.locales.get(rowIndex);
-			this.editor.setValue(locale, this.getSelected(), (String)aValue);
+			this.propertyEditor.setValue(locale, this.getSelected(), (String)aValue);
 		}
 	}
 	
@@ -139,7 +139,7 @@ public class PropertyValueTableModel implements TableModel {
 
 	protected void updateLocaleList() {
 		locales.clear();
-		locales.addAll(this.editor.getLocales());
+		locales.addAll(this.propertyEditor.getLocales());
 		Collections.sort(locales);
 		this.notifyChange(new TableModelEvent(this, TableModelEvent.ALL_COLUMNS));
 	}

@@ -27,7 +27,7 @@ import br.com.brokenbits.martelada.engine.PropertiesEditor;
 
 public class PropertyValuePanel extends JPanel implements PropertySelectionListener {
 	
-	private final PropertiesEditor editor;
+	private final PropertiesEditor propertyEditor;
 
 	private PropertyValueTableModel tableModel;
 	
@@ -35,8 +35,8 @@ public class PropertyValuePanel extends JPanel implements PropertySelectionListe
 	
 	private static final long serialVersionUID = 1L;
 
-	public PropertyValuePanel(PropertiesEditor engine) {
-		this.editor = engine;
+	public PropertyValuePanel(PropertiesEditor propertyEditor) {
+		this.propertyEditor = propertyEditor;
 		this.buildUI();
 	}
 	
@@ -44,7 +44,7 @@ public class PropertyValuePanel extends JPanel implements PropertySelectionListe
 	
 		this.setLayout(new BorderLayout());
 		
-		tableModel = new PropertyValueTableModel(editor);
+		tableModel = new PropertyValueTableModel(propertyEditor);
 		valueTable = new JTable(tableModel);
 		JScrollPane valueScrollPane = new JScrollPane(valueTable);
 		this.add(valueScrollPane, BorderLayout.CENTER);

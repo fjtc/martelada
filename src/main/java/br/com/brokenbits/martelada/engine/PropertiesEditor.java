@@ -26,6 +26,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,8 +74,13 @@ public class PropertiesEditor {
 		}
 	}
 	
+	/**
+	 * Returns a read-only view of the set of keys.
+	 * 
+	 * @return The set with the name of the keys.
+	 */
 	public Set<String> getKeys(){
-		return this.keySet;
+		return Collections.unmodifiableSet(this.keySet);
 	}
 
 	public Set<ResourceLocale> getLocales(){
@@ -226,7 +233,8 @@ public class PropertiesEditor {
 	}
 	
 	public boolean addProperty(String key) {
-		if (keySet.contains(key)) {
+
+		if (this.exists(key)) {
 			return false;
 		} else {
 			for (LocalizedProperties p : resourceFiles.values()) {
@@ -240,16 +248,20 @@ public class PropertiesEditor {
 	}
 	
 	public boolean removeProperty(String key) {
-		if (keySet.contains(key)) {
-			for (LocalizedProperties p : resourceFiles.values()) {
-				p.getProperties().remove(key);
-			}
+		if (this.exists(key)) {
+			removeProperyCore(key);
 			updateKeyList();
 			this.notifyPropertiesListener(new PropertiesEditorEvent(
 					PropertiesEditorEvent.EventType.PROPERTY_REMOVED, null, key, null, null));			
 			return true;
 		} else {
 			return false;
+		}
+	}
+	
+	private void removeProperyCore(String key) {
+		for (LocalizedProperties p : resourceFiles.values()) {
+			p.getProperties().remove(key);
 		}
 	}
 
@@ -290,5 +302,67 @@ public class PropertiesEditor {
 		this.updateKeyList();
 		this.notifyPropertiesListener(new PropertiesEditorEvent(
 				PropertiesEditorEvent.EventType.LOCALE_ADDED, locale));
+	}
+	
+	/**
+	 * Verifies if the key exists.
+	 * 
+	 * @param key The key name.
+	 * @return true if it exists or false otherwise.
+	 */
+	public boolean exists(String key) {
+		return this.keySet.contains(key);
+	}
+	
+	/**
+	 * Renames a given property.
+	 * 
+	 * @param oldKey
+	 * @param newKey
+	 * @return true for success or false otherwise.
+	 */
+	public boolean renamePropery(String oldKey, String newKey) {
+		
+		if (!this.exists(oldKey)) {
+			return false;
+		}
+		if (this.exists(newKey)) {
+			return false;
+		}
+		// Copy rename
+		for (LocalizedProperties p: this.resourceFiles.values()) {
+			p.getProperties().put(newKey, p.getProperties().get(oldKey));
+			p.getProperties().remove(oldKey);
+		}
+		this.keySet.add(newKey);
+		this.keySet.remove(oldKey);		
+		this.notifyPropertiesListener(new PropertiesEditorEvent(
+				PropertiesEditorEvent.EventType.RELOAD));
+		return true;
+	}
+
+	/**
+	 * This method scans the properties and sets the default value
+	 * for all properties that don't a value set. It is specially
+	 * useful when loading manually edited files.
+	 * 
+	 * @return The number of entries changed.
+	 */
+	public int fixMissing() {
+
+		int count = 0;
+		for (LocalizedProperties p: this.resourceFiles.values()) {
+			for (String key: this.keySet) {
+				if (p.getProperties().get(key) == null) {
+					p.getProperties().put(key, key);
+					count++;
+				}
+			}
+		}
+		if (count > 0) {
+			this.notifyPropertiesListener(new PropertiesEditorEvent(
+					PropertiesEditorEvent.EventType.RELOAD));			
+		}
+		return count;
 	}
 }

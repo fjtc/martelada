@@ -193,6 +193,7 @@ public class LocaleDialog extends JDialog {
 	public Locale showDialog() {
 		this.setModal(true);
 		this.locale = null;
+		this.setLocationRelativeTo(null);
 		this.setVisible(true);
 		return this.locale;
 	}

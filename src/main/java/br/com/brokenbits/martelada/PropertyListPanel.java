@@ -37,14 +37,14 @@ public class PropertyListPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	private final PropertiesEditor engine;
+	private final PropertiesEditor propertyEditor;
 	
 	private JList<String> propertyList;
 	
 	private List<PropertySelectionListener> propertySelectionListenerList = new ArrayList<PropertySelectionListener>();
 	
-	public PropertyListPanel(PropertiesEditor engine) {
-		this.engine = engine;
+	public PropertyListPanel(PropertiesEditor propertyEditor) {
+		this.propertyEditor = propertyEditor;
 		this.buildUI();
 	}
 	
@@ -73,7 +73,7 @@ public class PropertyListPanel extends JPanel {
 			}
 		});
 		
-		propertyList = new JList<String>(new PropertiesListModel(this.engine));
+		propertyList = new JList<String>(new PropertiesListModel(this.propertyEditor));
 		JScrollPane scrollPane = new JScrollPane(propertyList); 
 		this.add(scrollPane);
 		propertyList.addListSelectionListener(new ListSelectionListener() {
@@ -86,11 +86,10 @@ public class PropertyListPanel extends JPanel {
 	
 	protected void doAdd() {
 		
-		String value = JOptionPane.showInputDialog(this, 
-				"Name of the new property:", "dasd", 
-				JOptionPane.INFORMATION_MESSAGE);
-		if (value != null) {
-			if (!this.engine.addProperty(value)) {
+		PropertyNameDialog d = new PropertyNameDialog();
+		String newKey = d.showDialog("Add new key", this.getSelected(), this.propertyEditor.getKeys());
+		if (newKey != null) {
+			if (!this.propertyEditor.addProperty(newKey)) {
 				JOptionPane.showMessageDialog(this, "", "", JOptionPane.ERROR_MESSAGE);
 			}
 		}
@@ -111,7 +110,7 @@ public class PropertyListPanel extends JPanel {
 
 		String key = this.propertyList.getSelectedValue();
 		if (key != null) {
-			this.engine.removeProperty(key);
+			this.propertyEditor.removeProperty(key);
 		}
 	}
 	

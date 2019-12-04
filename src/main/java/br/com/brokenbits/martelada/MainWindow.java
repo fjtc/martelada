@@ -150,6 +150,10 @@ public class MainWindow extends JFrame {
 		splitPane.setDividerLocation(200);
 		this.getContentPane().add(splitPane, BorderLayout.CENTER);
 		
+		this.setJMenuBar(createMenuBar());
+	}
+	
+	private JMenuBar createMenuBar() {
 		// Menu
 		JMenuBar menuBar = new JMenuBar();
 		
@@ -234,6 +238,15 @@ public class MainWindow extends JFrame {
 		});
 		editMenu.add(copyKeyWithPatternMenuItem);
 		
+		JMenuItem renameMenuItem = new JMenuItem("Rename...");
+		renameMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C,	InputEvent.ALT_DOWN_MASK));
+		renameMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				doRename();
+			}
+		});
+		editMenu.add(renameMenuItem);
+		
 		editMenu.addSeparator();
 		JMenuItem addNewLocaleMenuItem = new JMenuItem(RESOURCES.getString("editMenuItem.addLocale"));
 		addNewLocaleMenuItem.addActionListener(new ActionListener() {
@@ -251,8 +264,7 @@ public class MainWindow extends JFrame {
 			}
 		});
 		editMenu.add(preferencesMenuItem);
-		
-		this.setJMenuBar(menuBar);
+		return menuBar;
 	}
 	
 	private void doLoadFile() {
@@ -397,9 +409,7 @@ public class MainWindow extends JFrame {
 	
 	private void doAddNewLocale() {
 		LocaleDialog dialog = new LocaleDialog();
-		dialog.setModal(true);
-		dialog.setVisible(true);
-		Locale l = dialog.getLocale();
+		Locale l = dialog.showDialog();
 		if (l != null) {
 			if (this.propertyEditor.addLocale(l)) {
 				JOptionPane.showMessageDialog(this, 
@@ -411,6 +421,26 @@ public class MainWindow extends JFrame {
 				JOptionPane.showMessageDialog(this, 
 						RESOURCES.getString("addLocale.failed"), 
 						this.getTitle(), JOptionPane.ERROR_MESSAGE);
+			}
+		}
+	}
+	
+	private void doRename() {
+
+		String key = this.propertyListPanel.getSelected();
+		if (key != null) {
+			PropertyNameDialog d = new PropertyNameDialog();
+			String newKey = d.showDialog("Rename property " + key, key, this.propertyEditor.getKeys());
+			if (newKey != null) {
+				if (this.propertyEditor.renamePropery(key, newKey)) {
+					JOptionPane.showMessageDialog(this, 
+							"Property renamed.", 
+							this.getTitle(), JOptionPane.ERROR_MESSAGE);
+				} else {
+					JOptionPane.showMessageDialog(this, 
+							"Unable to rename the property.", 
+							this.getTitle(), JOptionPane.ERROR_MESSAGE);
+				}
 			}
 		}
 	}

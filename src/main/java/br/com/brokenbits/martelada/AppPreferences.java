@@ -101,11 +101,11 @@ public class AppPreferences {
 		if (this.recentFiles.contains(file)) {
 			this.recentFiles.remove(file);
 		} else {
-			if (this.recentFiles.size() >= RECENT_FILE_LIST_SIZE) {
+			while (this.recentFiles.size() >= RECENT_FILE_LIST_SIZE) {
 				this.recentFiles.remove(this.recentFiles.size() - 1);
 			}
 		}
-		this.recentFiles.add(file);
+		this.recentFiles.add(0, file);
 	}
 	
 	public List<File> getRecentFiles(){

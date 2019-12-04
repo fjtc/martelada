@@ -82,6 +82,7 @@ public class PropertiesListModel implements ListModel<String> {
 	}
 	
 	public void reload() {
+		int oldSize = keyList.size();
 		keyList.clear();
 		for (String key: this.engine.getKeys()) {
 			if (!isFiltered(key)) {
@@ -89,14 +90,15 @@ public class PropertiesListModel implements ListModel<String> {
 			}
 		}
 		Collections.sort(keyList);
-		this.notifyChanges();
+		this.notifyChange(new ListDataEvent(this, 
+				ListDataEvent.INTERVAL_REMOVED, 
+						0, Math.max(keyList.size(), oldSize)));
 	}
 	
-	private void notifyChanges() {
-		ListDataEvent e = new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, 
-				0, this.engine.getKeys().size() - 1);
+	private void notifyChange(ListDataEvent e) {
 		for (ListDataListener l: this.listDataListenerList) {
 			l.contentsChanged(e);
 		}
 	}
 }
+
