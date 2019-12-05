@@ -18,16 +18,20 @@
 package br.com.brokenbits.martelada;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.SpringLayout;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -43,6 +47,10 @@ public class PropertyListPanel extends JPanel {
 	
 	private List<PropertySelectionListener> propertySelectionListenerList = new ArrayList<PropertySelectionListener>();
 	
+	private PropertiesListModel propertiesListModel;
+	
+	private JTextField filterTextField;
+	
 	public PropertyListPanel(PropertiesEditor propertyEditor) {
 		this.propertyEditor = propertyEditor;
 		this.buildUI();
@@ -52,8 +60,25 @@ public class PropertyListPanel extends JPanel {
 
 		this.setLayout(new BorderLayout());
 		
+		this.add(buildCommandPanel(), BorderLayout.NORTH);
+		
+		propertiesListModel = new PropertiesListModel(this.propertyEditor);
+		propertyList = new JList<String>(propertiesListModel);
+		JScrollPane scrollPane = new JScrollPane(propertyList); 
+		this.add(scrollPane);
+		propertyList.addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent event) {
+				doSelect();
+			}
+		});
+	}
+
+	private JPanel buildCommandPanel() {
+		
 		JPanel commandPanel = new JPanel();
-		this.add(commandPanel, BorderLayout.NORTH);
+		SpringLayout springLayout = new SpringLayout();
+		commandPanel.setLayout(springLayout);
 		
 		JButton addButton = new JButton("+");
 		commandPanel.add(addButton);
@@ -73,15 +98,35 @@ public class PropertyListPanel extends JPanel {
 			}
 		});
 		
-		propertyList = new JList<String>(new PropertiesListModel(this.propertyEditor));
-		JScrollPane scrollPane = new JScrollPane(propertyList); 
-		this.add(scrollPane);
-		propertyList.addListSelectionListener(new ListSelectionListener() {
+		JLabel filterLabel = new JLabel("Search");
+		commandPanel.add(filterLabel);
+		
+		filterTextField = new JTextField();
+		filterTextField.addActionListener(new ActionListener() {
 			@Override
-			public void valueChanged(ListSelectionEvent event) {
-				doSelect();
+			public void actionPerformed(ActionEvent e) {
+				doFilter();
 			}
 		});
+		commandPanel.add(filterTextField);
+		
+		springLayout.putConstraint(SpringLayout.NORTH, addButton, 5, SpringLayout.NORTH, commandPanel);
+		springLayout.putConstraint(SpringLayout.EAST, addButton, 5, SpringLayout.WEST, removeButton);
+
+		springLayout.putConstraint(SpringLayout.NORTH, removeButton, 0, SpringLayout.NORTH, addButton);
+		springLayout.putConstraint(SpringLayout.EAST, removeButton, -5, SpringLayout.EAST, commandPanel);
+
+		springLayout.putConstraint(SpringLayout.NORTH, filterLabel, 5, SpringLayout.SOUTH, addButton);
+		springLayout.putConstraint(SpringLayout.WEST, filterLabel, 5, SpringLayout.WEST, commandPanel);
+
+		springLayout.putConstraint(SpringLayout.NORTH, filterTextField, 0, SpringLayout.NORTH, filterLabel);
+		springLayout.putConstraint(SpringLayout.WEST, filterTextField, 5, SpringLayout.EAST, filterLabel);
+		springLayout.putConstraint(SpringLayout.EAST, filterTextField, -5, SpringLayout.EAST, commandPanel);
+	
+		
+		commandPanel.setPreferredSize(new Dimension(100, 
+				(int)(5 + addButton.getPreferredSize().getHeight() + 5 + filterTextField.getPreferredSize().getHeight() + 5)));
+		return commandPanel;
 	}
 	
 	protected void doAdd() {
@@ -128,5 +173,13 @@ public class PropertyListPanel extends JPanel {
 	
 	public void removePropertySelectionListener(PropertySelectionListener l) {
 		this.propertySelectionListenerList.remove(l);
+	}
+	
+	private void doFilter() {
+		if (this.filterTextField.getText().isBlank()) {
+			this.propertiesListModel.setFilter(null);
+		} else {
+			this.propertiesListModel.setFilter(new SubstringPropertyListFilter(this.filterTextField.getText()));
+		}
 	}
 }

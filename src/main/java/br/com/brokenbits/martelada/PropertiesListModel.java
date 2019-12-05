@@ -37,6 +37,8 @@ public class PropertiesListModel implements ListModel<String> {
 	
 	private final PropertiesEditor engine;
 	
+	private PropertyListFilter filter;
+	
 	public PropertiesListModel(PropertiesEditor engine) {
 		this.engine = engine;
 		this.engine.addListener(new PropertiesEditorListener() {
@@ -77,15 +79,19 @@ public class PropertiesListModel implements ListModel<String> {
 		this.listDataListenerList.remove(listener);
 	}
 	
-	private boolean isFiltered(String key) {
-		return false;
+	private boolean acceptKey(String key) {
+		if (this.filter == null) {
+			return true;
+		} else {
+			return this.filter.accept(key);
+		}
 	}
 	
 	public void reload() {
 		int oldSize = keyList.size();
 		keyList.clear();
 		for (String key: this.engine.getKeys()) {
-			if (!isFiltered(key)) {
+			if (acceptKey(key)) {
 				keyList.add(key);
 			}
 		}
@@ -99,6 +105,15 @@ public class PropertiesListModel implements ListModel<String> {
 		for (ListDataListener l: this.listDataListenerList) {
 			l.contentsChanged(e);
 		}
+	}
+
+	public PropertyListFilter getFilter() {
+		return filter;
+	}
+
+	public void setFilter(PropertyListFilter filter) {
+		this.filter = filter;
+		this.reload();
 	}
 }
 
