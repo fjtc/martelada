@@ -122,10 +122,9 @@ public class PropertyListPanel extends JPanel {
 		springLayout.putConstraint(SpringLayout.NORTH, filterTextField, 0, SpringLayout.NORTH, filterLabel);
 		springLayout.putConstraint(SpringLayout.WEST, filterTextField, 5, SpringLayout.EAST, filterLabel);
 		springLayout.putConstraint(SpringLayout.EAST, filterTextField, -5, SpringLayout.EAST, commandPanel);
-	
 		
-		commandPanel.setPreferredSize(new Dimension(100, 
-				(int)(5 + addButton.getPreferredSize().getHeight() + 5 + filterTextField.getPreferredSize().getHeight() + 5)));
+		springLayout.putConstraint(SpringLayout.SOUTH, commandPanel, 5, SpringLayout.SOUTH, filterTextField);
+	
 		return commandPanel;
 	}
 	
