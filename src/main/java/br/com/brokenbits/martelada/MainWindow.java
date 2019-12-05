@@ -305,7 +305,7 @@ public class MainWindow extends JFrame {
 			JOptionPane.showMessageDialog(this, 
 					"File saved.",
 					this.getTitle(),
-					JOptionPane.ERROR_MESSAGE);
+					JOptionPane.INFORMATION_MESSAGE);
 		} catch (IOException e) {
 			logger.error("Unable to save the file.", e);
 			JOptionPane.showMessageDialog(this, 
@@ -321,7 +321,7 @@ public class MainWindow extends JFrame {
 			JOptionPane.showMessageDialog(this, 
 					"File saved.",
 					this.getTitle(),
-					JOptionPane.ERROR_MESSAGE);
+					JOptionPane.INFORMATION_MESSAGE);
 		} catch (IOException e) {
 			logger.error("Unable to save the file.", e);
 			JOptionPane.showMessageDialog(this, this.getTitle(), 
