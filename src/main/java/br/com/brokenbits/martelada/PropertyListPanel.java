@@ -18,9 +18,6 @@
 package br.com.brokenbits.martelada;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,8 +29,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 import br.com.brokenbits.martelada.engine.PropertiesEditor;
 
@@ -66,12 +61,7 @@ public class PropertyListPanel extends JPanel {
 		propertyList = new JList<String>(propertiesListModel);
 		JScrollPane scrollPane = new JScrollPane(propertyList); 
 		this.add(scrollPane);
-		propertyList.addListSelectionListener(new ListSelectionListener() {
-			@Override
-			public void valueChanged(ListSelectionEvent event) {
-				doSelect();
-			}
-		});
+		propertyList.addListSelectionListener(e -> doSelect());
 	}
 
 	private JPanel buildCommandPanel() {
@@ -82,32 +72,17 @@ public class PropertyListPanel extends JPanel {
 		
 		JButton addButton = new JButton("+");
 		commandPanel.add(addButton);
-		addButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				doAdd();
-			}
-		});
+		addButton.addActionListener(e -> doAdd());
 		
 		JButton removeButton = new JButton("-");
 		commandPanel.add(removeButton);
-		removeButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				doRemove();
-			}
-		});
+		removeButton.addActionListener(e -> doRemove());
 		
 		JLabel filterLabel = new JLabel("Search");
 		commandPanel.add(filterLabel);
 		
 		filterTextField = new JTextField();
-		filterTextField.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				doFilter();
-			}
-		});
+		filterTextField.addActionListener(e -> doFilter());
 		commandPanel.add(filterTextField);
 		
 		springLayout.putConstraint(SpringLayout.NORTH, addButton, 5, SpringLayout.NORTH, commandPanel);

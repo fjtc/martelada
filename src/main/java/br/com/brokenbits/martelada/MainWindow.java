@@ -26,7 +26,6 @@ import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -164,55 +163,32 @@ public class MainWindow extends JFrame {
 		JMenuItem newMenuItem = new JMenuItem(RESOURCES.getString("fileMenuItem.new"));
 		newMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, 
 				InputEvent.SHIFT_DOWN_MASK | InputEvent.ALT_DOWN_MASK));
-		newMenuItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				doNewFile();
-			}
-		});
+		newMenuItem.addActionListener(e -> doNewFile());
 		fileMenu.add(newMenuItem);
 		
 		JMenuItem openMenuItem = new JMenuItem(RESOURCES.getString("fileMenuItem.open"));
-		openMenuItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				doLoadFile();
-			}
-		});
+		openMenuItem.addActionListener(e -> doLoadFile());
 		fileMenu.add(openMenuItem);
 		
 		recentFilesMenu = new JMenu(RESOURCES.getString("fileMenuItem.openRecent"));
 		fileMenu.add(recentFilesMenu);
-		recentFilesMenuActionListener = new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
+		recentFilesMenuActionListener = e -> {
 				Integer id = (Integer)((JComponent)e.getSource()).getClientProperty(RECENT_FILE_ID_PROPERTY);
 				loadRecent(id);
-			}
-		};
+			};
 
 		JMenuItem saveMenuItem = new JMenuItem(RESOURCES.getString("fileMenuItem.save"));
 		saveMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
-		saveMenuItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				doSave();
-			}
-		});
+		saveMenuItem.addActionListener(e -> doSave());
 		fileMenu.add(saveMenuItem);
 
 		JMenuItem saveAsMenuItem = new JMenuItem(RESOURCES.getString("fileMenuItem.saveAs"));
-		saveAsMenuItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				doSaveAs();
-			}
-		});
+		saveAsMenuItem.addActionListener(e -> doSaveAs());
 		fileMenu.add(saveAsMenuItem);
 		
 		fileMenu.addSeparator();
 		JMenuItem exitMenuItem = new JMenuItem(RESOURCES.getString("fileMenuItem.exit"));
-		exitMenuItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				doExit();
-			}
-		});
+		exitMenuItem.addActionListener(e -> doExit());
 		fileMenu.add(exitMenuItem);
 		
 		// File menu
@@ -222,47 +198,27 @@ public class MainWindow extends JFrame {
 		
 		JMenuItem copyKeyMenuItem = new JMenuItem(RESOURCES.getString("editMenuItem.copyKey"));
 		copyKeyMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK));
-		copyKeyMenuItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				doCopyKey();
-			}
-		});
+		copyKeyMenuItem.addActionListener(e -> doCopyKey());
 		editMenu.add(copyKeyMenuItem);
 		
 		JMenuItem copyKeyWithPatternMenuItem = new JMenuItem(RESOURCES.getString("editMenuItem.copyKeyWithPattern"));
 		copyKeyWithPatternMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C,	InputEvent.ALT_DOWN_MASK));
-		copyKeyWithPatternMenuItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				doCopyKeyWithPattern();
-			}
-		});
+		copyKeyWithPatternMenuItem.addActionListener(e -> doCopyKeyWithPattern());
 		editMenu.add(copyKeyWithPatternMenuItem);
 		
 		JMenuItem renameMenuItem = new JMenuItem("Rename...");
 		renameMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C,	InputEvent.ALT_DOWN_MASK));
-		renameMenuItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				doRename();
-			}
-		});
+		renameMenuItem.addActionListener(e -> doRename());
 		editMenu.add(renameMenuItem);
 		
 		editMenu.addSeparator();
 		JMenuItem addNewLocaleMenuItem = new JMenuItem(RESOURCES.getString("editMenuItem.addLocale"));
-		addNewLocaleMenuItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				doAddNewLocale();
-			}
-		});
+		addNewLocaleMenuItem.addActionListener(e -> doAddNewLocale());
 		editMenu.add(addNewLocaleMenuItem);				
 
 		editMenu.addSeparator();
 		JMenuItem preferencesMenuItem = new JMenuItem(RESOURCES.getString("editMenuItem.preferences"));
-		preferencesMenuItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				doPreferences();
-			}
-		});
+		preferencesMenuItem.addActionListener(e -> doPreferences());
 		editMenu.add(preferencesMenuItem);
 		return menuBar;
 	}

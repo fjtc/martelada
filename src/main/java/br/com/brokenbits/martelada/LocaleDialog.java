@@ -18,8 +18,6 @@
 package br.com.brokenbits.martelada;
 
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Locale;
 
 import javax.swing.JButton;
@@ -121,21 +119,11 @@ public class LocaleDialog extends JDialog {
 		
 		JPanel buttonPanel = new JPanel();
 		JButton okButton = new JButton("OK");
-		okButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				doOK();
-			}
-		});
+		okButton.addActionListener(e -> doOK());
 		buttonPanel.add(okButton);
 
 		JButton cancelButton = new JButton("Cancel");
-		cancelButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				doCancel();
-			}
-		});
+		cancelButton.addActionListener(e -> doCancel());
 		buttonPanel.add(cancelButton);
 		
 		this.getContentPane().add(buttonPanel, BorderLayout.SOUTH);

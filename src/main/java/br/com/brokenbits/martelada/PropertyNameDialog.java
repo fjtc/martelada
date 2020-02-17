@@ -18,8 +18,6 @@
 package br.com.brokenbits.martelada;
 
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Set;
 
 import javax.swing.JButton;
@@ -58,13 +56,7 @@ public class PropertyNameDialog extends JDialog {
 		
 		keyTextField = new JTextField();
 		mainPanel.add(keyTextField);
-		keyTextField.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				doOK();
-			}
-		});
-	
+		keyTextField.addActionListener(e -> doOK());	
 		
 		springLayout.putConstraint(SpringLayout.NORTH, keyLabel, 5, SpringLayout.NORTH, mainPanel);
 		springLayout.putConstraint(SpringLayout.WEST, keyLabel, 5, SpringLayout.WEST, mainPanel);
@@ -76,21 +68,11 @@ public class PropertyNameDialog extends JDialog {
 		
 		JPanel buttonPanel = new JPanel();
 		JButton okButton = new JButton("OK");
-		okButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				doOK();
-			}
-		});
+		okButton.addActionListener(e -> doOK());
 		buttonPanel.add(okButton);
 
 		JButton cancelButton = new JButton("Cancel");
-		cancelButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				doCancel();
-			}
-		});
+		cancelButton.addActionListener(e -> doCancel());
 		buttonPanel.add(cancelButton);
 		
 		this.getContentPane().add(buttonPanel, BorderLayout.SOUTH);		
