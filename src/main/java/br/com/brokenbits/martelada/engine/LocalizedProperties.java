@@ -17,14 +17,26 @@
  */
 package br.com.brokenbits.martelada.engine;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 
 public class LocalizedProperties {
 
+	private static final Charset DEFAULT_CHARSET = Charset.forName("utf-8");
+	
 	private final Properties properties = new Properties();
 	
 	private final ResourceLocale locale;
@@ -44,9 +56,57 @@ public class LocalizedProperties {
 		}
 	}
 	
+	
+	protected List<String> saveToLines(File file) throws IOException {
+		StringWriter writer = new StringWriter();
+		this.properties.store(writer, file.getName());
+		writer.close();
+		
+		List<String> lines = new ArrayList<>();
+		try (LineNumberReader reader = new LineNumberReader(new StringReader(writer.toString()))){
+			String line = reader.readLine();
+			while (line != null) {
+				lines.add(line);
+				line = reader.readLine();
+			}
+		}
+		return lines;
+	}
+	
 	public void save(File file) throws IOException {
-		try (FileOutputStream out = new FileOutputStream(file)) {
-			this.properties.store(out, file.getName());
+		
+		// NOTE: This implementation uses the original
+		// Properties.store() to generate the file. However,
+		// to keep it sorted, it converts the file into a list
+		// of lines and sorts the lines before writing the actual
+		// file. This approach works because each entry will be
+		// in a single line, as stated in the documentation 
+		// "Then every entry in this Properties table is written out, one per line.".
+		// Thus, no multiple line entries are expected.
+		
+		// Serialize all entries to a list of lines.
+		List<String> lines = saveToLines(file);
+		
+		// Extract the header because we don't want to sort its lines
+		List<String> header = new ArrayList<>();
+		while ((lines.size() > 0) && (lines.get(0).startsWith("#"))) {
+			header.add(lines.get(0));
+			lines.remove(0);
+		}
+		
+		// Sort the lines
+		Collections.sort(lines);
+
+		// Save the actual file
+		try (FileWriter writer = new FileWriter(file, DEFAULT_CHARSET)) {
+			for (String line: header) {
+				writer.write(line);
+				writer.write("\n");
+			}
+			for (String line: lines) {
+				writer.write(line);
+				writer.write("\n");
+			}
 		}
 	}
 

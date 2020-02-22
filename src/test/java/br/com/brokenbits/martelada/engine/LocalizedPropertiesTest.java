@@ -20,6 +20,11 @@ package br.com.brokenbits.martelada.engine;
 import static org.junit.Assert.*;
 
 import java.io.File;
+import java.io.FileReader;
+import java.io.LineNumberReader;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -50,7 +55,30 @@ public class LocalizedPropertiesTest {
 	@Test
 	public void testSave() throws Exception {
 		LocalizedProperties p = new LocalizedProperties(ResourceLocale.DEFAULT);
+		
+		p.getProperties().put("a1", "a2");
+		p.getProperties().put("a2", "a3");
+		p.getProperties().put("b1", "b2");
+		p.getProperties().put("c1", "c2");
+		
 		File file = File.createTempFile("test", ".properties");
 		p.save(file);
+		
+		List<String> lines = new ArrayList<>();
+		try (LineNumberReader reader = new LineNumberReader(new FileReader(file, Charset.forName("utf-8")))){
+			String l = reader.readLine();
+			while(l != null) {
+				lines.add(l);
+				l = reader.readLine();
+			}
+		}
+
+		String old = "";
+		for (String l: lines) {
+			if (!l.startsWith("#")) {
+				assertTrue(old.compareTo(l) <= 0);
+				old = l;
+			}
+		}
 	}
 }
