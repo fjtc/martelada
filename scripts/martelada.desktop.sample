@@ -1,0 +1,10 @@
+[Desktop Entry]
+# This is an example .desktop file that can be used with martelada
+Type=Application
+Version=1.0
+Name=martelada
+Comment=A multi-language Java Properties file editor
+Exec=/path/to/jdk11 -jar /path/to/martelada.jar
+Icon=jmemorize
+Terminal=false
+Categories=Programming;
