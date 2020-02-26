@@ -35,7 +35,7 @@ import java.util.Properties;
 
 public class LocalizedProperties {
 
-	private static final Charset DEFAULT_CHARSET = Charset.forName("utf-8");
+	private static final Charset DEFAULT_CHARSET = Charset.forName("iso-8859-1");
 	
 	private final Properties properties = new Properties();
 	
@@ -58,12 +58,17 @@ public class LocalizedProperties {
 	
 	
 	protected List<String> saveToLines(File file) throws IOException {
-		StringWriter writer = new StringWriter();
-		this.properties.store(writer, file.getName());
-		writer.close();
+		
+		byte [] body;
+		try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+			this.properties.store(out, file.getName());
+			out.flush();
+			body = out.toByteArray();
+		}
 		
 		List<String> lines = new ArrayList<>();
-		try (LineNumberReader reader = new LineNumberReader(new StringReader(writer.toString()))){
+		try (LineNumberReader reader = new LineNumberReader(
+				new InputStreamReader(new ByteArrayInputStream(body), DEFAULT_CHARSET))){
 			String line = reader.readLine();
 			while (line != null) {
 				lines.add(line);
